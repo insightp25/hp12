@@ -19,8 +19,12 @@ public class ConcertService {
     private final ConcertTitleRepository concertTitleRepository;
     private final SeatRepository seatRepository;
 
-    public List<Concert> findConcerts(long concertTitleId) {
-        return concertRepository.findByConcertTitleId(concertTitleId);
+    public List<Concert> findAvailable(long concertTitleId) {
+        List<Concert> concerts = concertRepository.findByConcertTitleId(concertTitleId);
+
+        return concerts.stream()
+            .filter(concert -> concert.accommodationCount() < concert.capacity())
+            .toList();
     }
 
     public List<Seat> findSeats(long concertTitleId, LocalDateTime occasion) {
