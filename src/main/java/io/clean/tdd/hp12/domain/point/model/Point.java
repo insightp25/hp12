@@ -1,5 +1,6 @@
 package io.clean.tdd.hp12.domain.point.model;
 
+import io.clean.tdd.hp12.domain.user.model.User;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 public record Point(
     long id,
     long point,
-    LocalDateTime createdAt
+    LocalDateTime updatedAt,
+    User user
 ) {
 }

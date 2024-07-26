@@ -1,6 +1,7 @@
 package io.clean.tdd.hp12.domain.queue.model;
 
 import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
+import io.clean.tdd.hp12.domain.user.model.User;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ public record WaitingQueue(
     WaitingQueueStatus status,
     LocalDateTime createdAt,
     LocalDateTime lastAccessAt,
-    LocalDateTime activatedAt
+    LocalDateTime activatedAt,
+    User user
 ) {
 }

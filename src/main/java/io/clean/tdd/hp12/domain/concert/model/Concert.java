@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public record Concert(
     long id,
     LocalDateTime occasion,
-    String location,
     ConcertTitle concertTitle
 ) {
 }
