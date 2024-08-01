@@ -14,4 +14,6 @@ public interface WaitingQueueRepository {
     void update(WaitingQueue token);
 
     WaitingQueue findFirstByStatusOrderByIdAsc(WaitingQueueStatus status);
+
+    WaitingQueue findByUserId(long userId);
 }

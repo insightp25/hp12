@@ -36,6 +36,6 @@ public class WaitingQueueService {
     public WaitingQueue push(long userId) {
         User user = userRepository.getById(userId);
 
-        return waitingQueueRepository.save(WaitingQueue.from(user));
+        return waitingQueueRepository.save(WaitingQueue.issueOf(user));
     }
 }
