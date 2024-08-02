@@ -75,14 +75,14 @@ public record WaitingQueue(
         }
     }
 
-    public WaitingQueue refreshForPayment(WaitingQueue token) {
+    public WaitingQueue refreshForPayment() {
         return WaitingQueue.builder()
             .id(id)
             .accessKey(accessKey)
             .status(status)
             .createdAt(createdAt)
-            .lastAccessAt(lastAccessAt)
-            .expiresAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+            .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+            .expiresAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusMinutes(TokenPolicies.PAYMENT_DURATION_MINUTES))
             .user(user)
             .build();
     }

@@ -13,19 +13,19 @@ public record Seat(
     SeatOption seatOption,
     Concert concert
 ) {
-    public void validate() {
+    public void validateAvailabile() {
         if (status.equals(SeatStatus.OCCUPIED)) {
             throw new CustomException(ErrorCode.SEAT_OCCUPIED_ERROR, "좌석 %d 번".formatted(seatNumber()));
         }
     }
 
-    public static Seat hold(Seat seat) {
+    public Seat hold() {
         return io.clean.tdd.hp12.domain.concert.model.Seat.builder()
-            .id(seat.id())
+            .id(id)
             .status(SeatStatus.ON_HOLD)
-            .seatNumber(seat.seatNumber())
-            .seatOption(seat.seatOption())
-            .concert(seat.concert())
+            .seatNumber(seatNumber)
+            .seatOption(seatOption)
+            .concert(concert)
             .build();
     }
 }

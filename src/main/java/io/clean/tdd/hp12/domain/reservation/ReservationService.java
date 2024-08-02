@@ -29,7 +29,7 @@ public class ReservationService {
         List<Seat> seats = seatNumbers.stream()
             .map(seatNumber -> seatRepository.findByConcertIdAndSeatNumber(concertId, seatNumber))
             .toList();
-        seats.forEach(Seat::validate);
+        seats.forEach(Seat::validateAvailabile);
         List<Seat> seatsOnHold = seats.stream()
             .map(Seat::hold)
             .map(seatRepository::update)
@@ -41,7 +41,8 @@ public class ReservationService {
         paymentRepository.save(payment);
 
         WaitingQueue token = waitingQueueRepository.findByUserId(user.id());
-        waitingQueueRepository.update(token.refreshForPayment(token));
+        WaitingQueue refreshedToken = token.refreshForPayment();
+        waitingQueueRepository.update(refreshedToken);
 
         List<Reservation> reservations = Reservation.hold(seatsOnHold, user, payment);
         reservations.forEach(reservationRepository::save);
