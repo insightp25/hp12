@@ -1,6 +1,5 @@
 package io.clean.tdd.hp12.domain.reservation;
 
-import io.clean.tdd.hp12.domain.common.CustomException;
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
 import io.clean.tdd.hp12.domain.point.model.Point;
@@ -15,13 +14,9 @@ import io.clean.tdd.hp12.domain.reservation.port.PaymentRepository;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.domain.user.port.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +31,7 @@ public class ReservationService {
     private final WaitingQueueRepository waitingQueueRepository;
 
     public List<Reservation> hold(long userId, long concertId, List<Integer> seatNumbers) {
+        //1. seat: 예약을 희망하는 좌석(들)을 임시 점유 처리한다
         List<Seat> seats = seatNumbers.stream()
             .map(seatNumber -> seatRepository.findByConcertIdAndSeatNumber(concertId, seatNumber))
             .toList();
@@ -45,18 +41,22 @@ public class ReservationService {
             .map(seatRepository::update)
             .toList();
 
+        //2. 결제 정보를 생성후 저장한다
         User user = userRepository.getById(userId);
         long dueAmount = Payment.calculateAmount(seatsOnHold);
         Payment payment = Payment.issuePayment(user, dueAmount);
         paymentRepository.save(payment);
 
+        //3. 임시 예약하는 현재 시점에서 대기열의 만료 시간을 정책시간 만큼 업데이트 한다.
         WaitingQueue token = waitingQueueRepository.findByUserId(user.id());
         WaitingQueue refreshedToken = token.refreshForPayment();
         waitingQueueRepository.update(refreshedToken);
 
+        //4. 임시 예약 정보를 생성후 저장한다
         List<Reservation> reservations = Reservation.hold(seatsOnHold, user, payment);
         reservations.forEach(reservationRepository::save);
 
+        //5. 임시 예약 정보를 반환한다
         return reservations;
     }
 
@@ -82,10 +82,11 @@ public class ReservationService {
             .map(Seat::close)
             .forEach(seatRepository::update);
 
-        //5. waiting queue: 대기 토큰을 만료한다.
+        //5. waiting queue: 대기 토큰을 만료한다
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire();
         waitingQueueRepository.update(expiredToken);
 
+        //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
     }
 }
