@@ -30,4 +30,14 @@ public record Reservation(
                 .build())
             .collect(Collectors.toList());
     }
+
+    public Reservation finalizeStatus() {
+        return Reservation.builder()
+                .status(ReservationStatus.FINALIZED)
+                .createdAt(createdAt)
+                .seat(seat)
+                .user(user)
+                .payment(payment)
+                .build();
+    }
 }

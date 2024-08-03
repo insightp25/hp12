@@ -86,4 +86,20 @@ public record WaitingQueue(
             .user(user)
             .build();
     }
+
+    public WaitingQueue expire() {
+        if (status == WaitingQueueStatus.EXPIRED) {
+            throw new CustomException(ErrorCode.TOKEN_STATUS_EXPIRED_ERROR);
+        }
+
+        return WaitingQueue.builder()
+            .id(id)
+            .accessKey(accessKey)
+            .status(WaitingQueueStatus.EXPIRED)
+            .createdAt(createdAt)
+            .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+            .expiresAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+            .user(user)
+            .build();
+    }
 }

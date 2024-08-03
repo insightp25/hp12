@@ -20,9 +20,19 @@ public record Seat(
     }
 
     public Seat hold() {
-        return io.clean.tdd.hp12.domain.concert.model.Seat.builder()
+        return Seat.builder()
             .id(id)
             .status(SeatStatus.ON_HOLD)
+            .seatNumber(seatNumber)
+            .seatOption(seatOption)
+            .concert(concert)
+            .build();
+    }
+
+    public Seat close() {
+        return Seat.builder()
+            .id(id)
+            .status(SeatStatus.OCCUPIED)
             .seatNumber(seatNumber)
             .seatOption(seatOption)
             .concert(concert)
