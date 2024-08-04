@@ -14,6 +14,8 @@ import io.clean.tdd.hp12.domain.reservation.port.PaymentRepository;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.domain.user.port.UserRepository;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -88,5 +90,10 @@ public class ReservationService {
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
+    }
+
+    public void bulkExpireTimedOutReservations() {
+        reservationRepository.bulkExpireTimedOutReservations(LocalDateTime.now().truncatedTo(
+            ChronoUnit.SECONDS));
     }
 }
