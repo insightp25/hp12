@@ -1,5 +1,6 @@
 package io.clean.tdd.hp12.domain.reservation.port;
 
+import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 
 import java.time.LocalDateTime;
@@ -10,5 +11,5 @@ public interface ReservationRepository {
 
     List<Reservation> findByPaymentId(long paymentId);
 
-    void bulkExpireTimedOutReservations(LocalDateTime localDateTime);
+    List<Reservation> bulkAbolishTimedOutOnHoldReservations(LocalDateTime localDateTime, ReservationStatus status);
 }

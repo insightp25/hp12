@@ -1,5 +1,6 @@
 package io.clean.tdd.hp12.interfaces.scheduler;
 
+import io.clean.tdd.hp12.common.BusinessPolicies;
 import io.clean.tdd.hp12.domain.queue.WaitingQueueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,8 +12,7 @@ public class WaitingQueueScheduler {
 
     private final WaitingQueueService waitingQueueService;
 
-    // 특정 시간 간격마다 현재를 기준으로 유효시간이 초과된 토큰을 만료시킨다.
-    @Scheduled(fixedRate = 5 * 1000)
+    @Scheduled(fixedRate = BusinessPolicies.EXPIRATION_SCHEDULING_INTERVAL_MINUTES * 1000)
     public void expireTimedOutTokens() {
         waitingQueueService.bulkExpireTimedOutTokens();
     }

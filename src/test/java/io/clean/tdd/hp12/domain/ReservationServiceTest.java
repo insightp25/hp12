@@ -1,6 +1,6 @@
 package io.clean.tdd.hp12.domain;
 
-import io.clean.tdd.hp12.common.TokenPolicies;
+import io.clean.tdd.hp12.common.BusinessPolicies;
 import io.clean.tdd.hp12.domain.concert.enums.SeatStatus;
 import io.clean.tdd.hp12.domain.concert.model.Concert;
 import io.clean.tdd.hp12.domain.concert.model.ConcertTitle;
@@ -85,8 +85,6 @@ public class ReservationServiceTest {
             .id(1L)
             .occasion(LocalDateTime.now().minusDays(7))
             .concertTitle(concertTitle)
-            .capacity(50)
-            .accommodationCount(0)
             .build();
         SeatOption seatOption = SeatOption.builder()
             .id(1L)
@@ -141,7 +139,7 @@ public class ReservationServiceTest {
             .status(WaitingQueueStatus.ACTIVE)
             .createdAt(LocalDateTime.now().minusMinutes(5))
             .lastAccessAt(LocalDateTime.now())
-            .expiresAt(LocalDateTime.now().plusMinutes(TokenPolicies.ACTIVATION_DURATION_MINUTES - 5))
+            .expireAt(LocalDateTime.now().plusMinutes(BusinessPolicies.ACTIVE_TOKEN_DURATION_MINUTES - 5))
             .user(user)
             .build();
 
@@ -159,7 +157,8 @@ public class ReservationServiceTest {
         BDDMockito.doNothing().when(paymentRepository).save(any(Payment.class));
         BDDMockito.doNothing().when(waitingQueueRepository).update(any(WaitingQueue.class));
         BDDMockito.given(waitingQueueRepository.findByUserId(anyLong())).willReturn(token);
-        BDDMockito.doNothing().when(reservationRepository).save(any(Reservation.class));
+        BDDMockito.given(reservationRepository.save(any(Reservation.class)))
+            .willAnswer(invocation -> invocation.<Reservation>getArgument(0));
 
         //when
         List<Reservation> result = reservationService.hold(user.id(), concert.id(), new ArrayList<>(Arrays.asList(1, 2, 3)));

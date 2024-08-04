@@ -22,7 +22,7 @@ public class WaitingQueueService {
         return waitingQueueRepository.getByAccessKey(accessKey);
     }
 
-    public void activate(WaitingQueue token) {
+    public WaitingQueue activate(WaitingQueue token) {
         //1. 현재 활성중인 토큰 개수를 센다
         int activeTokenCount = waitingQueueRepository.getActiveStatusCount();
 
@@ -38,7 +38,7 @@ public class WaitingQueueService {
         waitingQueueRepository.update(refreshedToken);
 
         //5. 위 단계에서 활성을 진행하지 못했을시 대기 순번 정보와 함께 오류를 반환한다
-        refreshedToken.verifyActivation(tokenCountWaitingAhead);
+        return refreshedToken.confirmActivation(tokenCountWaitingAhead);
     }
 
     public WaitingQueue push(long userId) {

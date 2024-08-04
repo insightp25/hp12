@@ -31,4 +31,13 @@ public record Payment(
             .mapToLong(seat -> seat.seatOption().price())  // Extract prices
             .sum();
     }
+
+    public Payment abolish() {
+        return Payment.builder()
+            .amount(amount)
+            .status(PaymentStatus.ABOLISHED)
+            .createdAt(createdAt)
+            .user(user)
+            .build();
+    }
 }
