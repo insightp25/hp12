@@ -3,7 +3,6 @@ package io.clean.tdd.hp12.domain.concert;
 import io.clean.tdd.hp12.domain.concert.model.Concert;
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.ConcertRepository;
-import io.clean.tdd.hp12.domain.concert.port.ConcertTitleRepository;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.util.List;
 public class ConcertService {
 
     private final ConcertRepository concertRepository;
-    private final ConcertTitleRepository concertTitleRepository;
     private final SeatRepository seatRepository;
 
     public List<Concert> find(long concertTitleId) {
