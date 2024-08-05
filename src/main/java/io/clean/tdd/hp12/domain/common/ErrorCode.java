@@ -12,6 +12,7 @@ public enum ErrorCode {
     TOKEN_STATUS_WAITING_ERROR("409", "대기 상태이므로 접근할 수 없습니다"),
     TOKEN_STATUS_EXPIRED_ERROR("409", "접근 권한이 만료되었습니다"),
     TOKEN_NOT_FOUND_ERROR("409", "접근을 위한 대기 토큰이 존재하지 않습니다"),
+    NO_MATCHING_TOKEN_ERROR("409", "일치하는 유효한 토큰이 존재하지 않습니다"),
 
     SEAT_OCCUPIED_ERROR("409", "좌석이 이미 점유되어 있습니다"),
 

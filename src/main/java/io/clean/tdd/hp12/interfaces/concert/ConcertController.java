@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Controller("/concertTitles")
-@RequestMapping
+@Controller
+@RequestMapping("/concertTitles")
 @RequiredArgsConstructor
 public class ConcertController {
 
@@ -23,6 +23,7 @@ public class ConcertController {
     @GetMapping("/{concertTitleId}")
     public ResponseEntity<List<Concert>> concerts(
         @PathVariable("concertTitleId") long concertTitleId) {
+
         return ResponseEntity
             .ok()
             .body(concertService.find(concertTitleId));
@@ -31,8 +32,8 @@ public class ConcertController {
     @GetMapping("/{concertTitleId}/occasions/{occasion}")
     public ResponseEntity<List<Seat>> seats(
         @PathVariable("concertTitleId") long concertTitleId,
-        @PathVariable("occasion")LocalDateTime occasion
-    ) {
+        @PathVariable("occasion")LocalDateTime occasion) {
+
         return ResponseEntity
             .ok()
             .body(concertService.findSeats(concertTitleId, occasion));
