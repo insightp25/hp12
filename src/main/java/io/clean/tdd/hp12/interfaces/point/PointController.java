@@ -12,34 +12,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping
+@RequestMapping("/points")
 @RequiredArgsConstructor
 public class PointController {
 
     private final PointService pointService;
 
-    @GetMapping("/points")
+    @GetMapping
     public ResponseEntity<Point> point(@RequestParam("userId") long userId) {
+        System.out.println("howdy");
         return ResponseEntity
             .ok()
             .body(pointService.getOf(userId));
     }
 
-    @GetMapping("/point_history")
+    @GetMapping("/history")
     public ResponseEntity<List<PointHistory>> pointHistory(@RequestParam("userId") long userId) {
         return ResponseEntity
             .ok()
             .body(pointService.getHistoriesOf(userId));
     }
 
-    @PostMapping("/points/charge")
+    @PostMapping("/charge")
     public ResponseEntity<Point> charge(@RequestBody PointRequest pointRequest) {
+        System.out.println("howdy");
         return ResponseEntity
             .ok()
             .body(pointService.charge(pointRequest.userId(), pointRequest.amount()));
     }
 
-    @PostMapping("/points/use")
+    @PostMapping("/use")
     public ResponseEntity<Point> use(@RequestBody PointRequest pointRequest) {
         return ResponseEntity
             .ok()

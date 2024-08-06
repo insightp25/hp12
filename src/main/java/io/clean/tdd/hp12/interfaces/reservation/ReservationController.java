@@ -5,6 +5,7 @@ import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.interfaces.reservation.request.ReservationFinalizeRequest;
 import io.clean.tdd.hp12.interfaces.reservation.request.ReservationHoldRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +37,7 @@ public class ReservationController {
     @PostMapping("/finalize")
     public ResponseEntity<List<Reservation>> finalization(
         @RequestBody ReservationFinalizeRequest reservationFinalizeRequest,
-        @RequestHeader("Authorization") String accessKey) {
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String accessKey) {
 
         return ResponseEntity
             .ok()
