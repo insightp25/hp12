@@ -56,7 +56,7 @@ public class ReservationService {
         //3. 임시 예약하는 현재 시점에서 대기열의 만료 시간을 정책시간 만큼 업데이트 한다.
         WaitingQueue token = waitingQueueRepository.findByUserId(user.id());
         WaitingQueue refreshedToken = token.refreshForPayment();
-        waitingQueueRepository.update(refreshedToken);
+        waitingQueueRepository.save(refreshedToken);
 
         //4. 임시 예약 정보를 생성후 저장한다
         List<Reservation> reservations = Reservation.hold(seatsOnHold, user, payment);
@@ -91,7 +91,7 @@ public class ReservationService {
 
         //5. waiting queue: 대기 토큰을 만료한다
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire();
-        waitingQueueRepository.update(expiredToken);
+        waitingQueueRepository.save(expiredToken);
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
@@ -110,7 +110,7 @@ public class ReservationService {
         abolishedReservations.stream()
             .findFirst()
             .ifPresent(reservation -> {
-                paymentRepository.update(reservation.payment().abolish());
+                paymentRepository.save(reservation.payment().abolish());
             });
 
         //3. 임시 점유 상태 좌석을 사용 가능 상태로 되돌린다

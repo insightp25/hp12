@@ -3,11 +3,11 @@ package io.clean.tdd.hp12.infrastructure.queue;
 import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
 import io.clean.tdd.hp12.domain.queue.model.WaitingQueue;
 import io.clean.tdd.hp12.domain.queue.port.WaitingQueueRepository;
+import io.clean.tdd.hp12.infrastructure.queue.entity.WaitingQueueEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,7 +17,9 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
 
     @Override
     public WaitingQueue getByAccessKey(String accessKey) {
-        return waitingQueueJpaRepository.findByAccessKey(accessKey);
+        return waitingQueueJpaRepository.findOptionalByAccessKey(accessKey)
+            .orElseThrow()
+            .toModel();
     }
 
     @Override
@@ -26,29 +28,21 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
     }
 
     @Override
-    public WaitingQueue save(WaitingQueue waitingQueue) {
-        return waitingQueueJpaRepository.save(waitingQueue);
-    }
-
-    //redundant! to be deleted
-    @Override
-    public void update(WaitingQueue token) {
-        waitingQueueJpaRepository.save(token);
+    public WaitingQueue save(WaitingQueue token) {
+        return waitingQueueJpaRepository.save(WaitingQueueEntity.from(token))
+            .toModel();
     }
 
     @Override
     public WaitingQueue findFirstByStatusOrderByIdAsc(WaitingQueueStatus status) {
-        return waitingQueueJpaRepository.findFirstByStatusOrderByIdAsc(status);
+        return waitingQueueJpaRepository.findFirstByStatusOrderByIdAsc(status)
+            .toModel();
     }
 
     @Override
     public WaitingQueue findByUserId(long userId) {
-        return waitingQueueJpaRepository.findByUser_Id(userId);
-    }
-
-    @Override
-    public Optional<WaitingQueue> findByAccessKey(String accessKey) {
-        return waitingQueueJpaRepository.findByAccessKey(accessKey);
+        return waitingQueueJpaRepository.findByUser_Id(userId)
+            .toModel();
     }
 
     @Override

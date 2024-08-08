@@ -42,7 +42,7 @@ public class WaitingQueueService {
 
         //4. (활성이 허용범위라면)토큰을 활성화 한 후 저장한다
         WaitingQueue refreshedToken = token.refresh(isActivationPermitted);
-        waitingQueueRepository.update(refreshedToken);
+        waitingQueueRepository.save(refreshedToken);
 
         //5. 위 단계에서 활성을 진행하지 못했을시 대기 순번 정보와 함께 오류를 반환한다
         refreshedToken.confirmActivation(tokenCountWaitingAhead);

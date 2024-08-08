@@ -2,6 +2,7 @@ package io.clean.tdd.hp12.infrastructure.concert;
 
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
+import io.clean.tdd.hp12.infrastructure.concert.entity.SeatEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,16 +16,20 @@ public class SeatRepositoryImpl implements SeatRepository {
 
     @Override
     public List<Seat> findByConcertId(long concertId) {
-        return seatJpaRepository.findByConcert_Id(concertId);
+        return seatJpaRepository.findByConcert_Id(concertId).stream()
+            .map(SeatEntity::toModel)
+            .toList();
     }
 
     @Override
     public Seat findByConcertIdAndSeatNumber(long concertId, int seatNumber) {
-        return seatJpaRepository.findByConcert_IdAndSeatNumber(concertId, seatNumber);
+        return seatJpaRepository.findByConcert_IdAndSeatNumber(concertId, seatNumber)
+            .toModel();
     }
 
     @Override
     public Seat save(Seat seat) {
-        return seatJpaRepository.save(seat);
+        return seatJpaRepository.save(SeatEntity.from(seat))
+            .toModel();
     }
 }

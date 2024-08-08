@@ -14,13 +14,9 @@ public interface WaitingQueueRepository {
 
     WaitingQueue save(WaitingQueue waitingQueue);
 
-    void update(WaitingQueue token);
-
     WaitingQueue findFirstByStatusOrderByIdAsc(WaitingQueueStatus status);
 
     WaitingQueue findByUserId(long userId);
-
-    Optional<WaitingQueue> findByAccessKey(String accessKey);
 
     void bulkExpire(LocalDateTime localDateTime);
 }

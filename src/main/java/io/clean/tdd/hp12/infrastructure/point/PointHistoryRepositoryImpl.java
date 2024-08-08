@@ -2,6 +2,7 @@ package io.clean.tdd.hp12.infrastructure.point;
 
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
+import io.clean.tdd.hp12.infrastructure.point.entity.PointHistoryEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,11 +16,13 @@ public class PointHistoryRepositoryImpl implements PointHistoryRepository {
 
     @Override
     public List<PointHistory> findAllByUserId(long userId) {
-        return pointHistoryJpaRepository.findAllByUser_Id(userId);
+        return pointHistoryJpaRepository.findAllByUser_Id(userId).stream()
+            .map(PointHistoryEntity::toModel)
+            .toList();
     }
 
     @Override
     public void save(PointHistory pointHistory) {
-        pointHistoryJpaRepository.save(pointHistory);
+        pointHistoryJpaRepository.save(PointHistoryEntity.from(pointHistory));
     }
 }

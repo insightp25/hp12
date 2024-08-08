@@ -1,6 +1,6 @@
 package io.clean.tdd.hp12.infrastructure.concert;
 
-import io.clean.tdd.hp12.infrastructure.concert.model.SeatEntity;
+import io.clean.tdd.hp12.infrastructure.concert.entity.SeatEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

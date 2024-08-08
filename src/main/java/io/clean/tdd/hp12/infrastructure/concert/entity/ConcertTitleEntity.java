@@ -1,18 +1,18 @@
-package io.clean.tdd.hp12.infrastructure.concert.model;
+package io.clean.tdd.hp12.infrastructure.concert.entity;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "seat_option")
-public class SeatOptionEntity {
+@Table(name = "concert_title")
+public class ConcertTitleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(nullable = false)
-    String classifiedAs;
+    String title;
 
     @Column(nullable = false)
-    Long price;
+    String description;
 }

@@ -1,5 +1,6 @@
-package io.clean.tdd.hp12.infrastructure.concert.model;
+package io.clean.tdd.hp12.infrastructure.concert.entity;
 
+import io.clean.tdd.hp12.domain.concert.model.Concert;
 import io.clean.tdd.hp12.domain.concert.model.ConcertTitle;
 import jakarta.persistence.*;
 
@@ -19,4 +20,12 @@ public class ConcertEntity {
     @ManyToOne
     @JoinColumn(nullable = false)
     ConcertTitle concertTitle;
+
+    public Concert toModel() {
+        return Concert.builder()
+            .id(id)
+            .occasion(occasion)
+            .concertTitle(concertTitle)
+            .build();
+    }
 }
