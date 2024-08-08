@@ -10,7 +10,7 @@ public interface WaitingQueueRepository {
 
     WaitingQueue getByAccessKey(String accessKey);
 
-    int getActiveStatusCount();
+    int getStatusCount(WaitingQueueStatus status);
 
     WaitingQueue save(WaitingQueue waitingQueue);
 

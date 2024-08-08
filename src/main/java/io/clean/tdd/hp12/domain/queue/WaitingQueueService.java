@@ -31,7 +31,7 @@ public class WaitingQueueService {
     //(인터셉터 사용)
     public void activate(WaitingQueue token) {
         //1. 현재 활성중인 토큰 개수를 센다
-        int activeTokenCount = waitingQueueRepository.getActiveStatusCount();
+        int activeTokenCount = waitingQueueRepository.getStatusCount(WaitingQueueStatus.ACTIVE);
 
         //2. 대기중 첫번째 순서의 토큰을 가져온다
         WaitingQueue tokenFirstOnLine = waitingQueueRepository.findFirstByStatusOrderByIdAsc(WaitingQueueStatus.WAITING);

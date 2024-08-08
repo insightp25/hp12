@@ -149,9 +149,9 @@ public class ReservationServiceTest {
             .willReturn(seat2);
         BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat3.seatNumber()))
             .willReturn(seat3);
-        BDDMockito.given(seatRepository.update(seat1OnHold)).willReturn(seat1OnHold);
-        BDDMockito.given(seatRepository.update(seat2OnHold)).willReturn(seat2OnHold);
-        BDDMockito.given(seatRepository.update(seat3OnHold)).willReturn(seat3OnHold);
+        BDDMockito.given(seatRepository.save(seat1OnHold)).willReturn(seat1OnHold);
+        BDDMockito.given(seatRepository.save(seat2OnHold)).willReturn(seat2OnHold);
+        BDDMockito.given(seatRepository.save(seat3OnHold)).willReturn(seat3OnHold);
         BDDMockito.given(userRepository.getById(anyLong()))
             .willReturn(user);
         BDDMockito.doNothing().when(paymentRepository).save(any(Payment.class));

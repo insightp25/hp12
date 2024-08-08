@@ -44,7 +44,7 @@ public class ReservationService {
         seats.forEach(Seat::validateAvailabile);
         List<Seat> seatsOnHold = seats.stream()
             .map(Seat::hold)
-            .map(seatRepository::update)
+            .map(seatRepository::save)
             .toList();
 
         //2. 결제 정보를 생성후 저장한다
@@ -87,7 +87,7 @@ public class ReservationService {
         finalizedReservations.stream()
             .map(Reservation::seat)
             .map(Seat::close)
-            .forEach(seatRepository::update);
+            .forEach(seatRepository::save);
 
         //5. waiting queue: 대기 토큰을 만료한다
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire();
@@ -117,6 +117,6 @@ public class ReservationService {
         abolishedReservations.stream()
             .map(Reservation::seat)
             .map(Seat::vacate)
-            .forEach(seatRepository::update);
+            .forEach(seatRepository::save);
     }
 }
