@@ -19,6 +19,8 @@ public class WaitingQueueController {
 
     @PostMapping
     public ResponseEntity<WaitingQueue> issueOf(@RequestBody TokenIssueRequest tokenIssueRequest) {
+        System.out.println("howdy");
+
         return ResponseEntity
             .ok()
             .body(waitingQueueService.push(tokenIssueRequest.userId()));
