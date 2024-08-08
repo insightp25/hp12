@@ -149,14 +149,20 @@ public class ReservationServiceTest {
             .willReturn(seat2);
         BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat3.seatNumber()))
             .willReturn(seat3);
-        BDDMockito.given(seatRepository.save(seat1OnHold)).willReturn(seat1OnHold);
-        BDDMockito.given(seatRepository.save(seat2OnHold)).willReturn(seat2OnHold);
-        BDDMockito.given(seatRepository.save(seat3OnHold)).willReturn(seat3OnHold);
+        BDDMockito.given(seatRepository.save(seat1OnHold))
+            .willReturn(seat1OnHold);
+        BDDMockito.given(seatRepository.save(seat2OnHold))
+            .willReturn(seat2OnHold);
+        BDDMockito.given(seatRepository.save(seat3OnHold))
+            .willReturn(seat3OnHold);
         BDDMockito.given(userRepository.getById(anyLong()))
             .willReturn(user);
-        BDDMockito.doNothing().when(paymentRepository).save(any(Payment.class));
-        BDDMockito.doNothing().when(waitingQueueRepository).update(any(WaitingQueue.class));
-        BDDMockito.given(waitingQueueRepository.findByUserId(anyLong())).willReturn(token);
+        BDDMockito.given(paymentRepository.save(any(Payment.class)))
+            .willReturn(null);
+        BDDMockito.given(waitingQueueRepository.save(any(WaitingQueue.class)))
+            .willReturn(null);
+        BDDMockito.given(waitingQueueRepository.findByUserId(anyLong()))
+            .willReturn(token);
         BDDMockito.given(reservationRepository.save(any(Reservation.class)))
             .willAnswer(invocation -> invocation.<Reservation>getArgument(0));
 
