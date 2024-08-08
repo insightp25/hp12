@@ -11,5 +11,5 @@ public interface ReservationRepository {
 
     List<Reservation> findByPaymentId(long paymentId);
 
-    List<Reservation> bulkAbolishTimedOutOnHoldReservations(LocalDateTime localDateTime, ReservationStatus status);
+    List<Reservation> findAllByStatusAndExpireAtLessThanEqual(ReservationStatus status, LocalDateTime now);
 }

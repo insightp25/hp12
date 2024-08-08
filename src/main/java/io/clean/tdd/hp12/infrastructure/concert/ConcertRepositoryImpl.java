@@ -17,14 +17,20 @@ public class ConcertRepositoryImpl implements ConcertRepository {
 
     @Override
     public List<Concert> findByConcertTitleId(long concertTitleId) {
-        return concertJpaRepository.findByConcertTitle_Id(concertTitleId).stream()
+        return concertJpaRepository.findByConcertTitleEntity_Id(concertTitleId).stream()
             .map(ConcertEntity::toModel)
             .toList();
     }
 
     @Override
     public Concert findByConcertTitleIdAndOccasion(long concertTitleId, LocalDateTime occasion) {
-        return concertJpaRepository.findByConcertTitle_IdAndOccasion(concertTitleId, occasion)
+        return concertJpaRepository.findByConcertTitleEntity_IdAndOccasion(concertTitleId, occasion)
+            .toModel();
+    }
+
+    @Deprecated
+    public Concert save(Concert concert) {
+        return concertJpaRepository.save(ConcertEntity.from(concert))
             .toModel();
     }
 }

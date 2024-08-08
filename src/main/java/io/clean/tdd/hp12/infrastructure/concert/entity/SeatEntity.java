@@ -22,20 +22,20 @@ public class SeatEntity {
     Integer seatNumber;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    SeatOption seatOption;
+    @JoinColumn(name = "seat_option_id", nullable = false)
+    SeatOptionEntity seatOptionEntity;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    Concert concert;
+    @JoinColumn(name = "concert_id", nullable = false)
+    ConcertEntity concertEntity;
 
     public static SeatEntity from(Seat seat) {
         SeatEntity seatEntity = new SeatEntity();
         seatEntity.id = seat.id();
         seatEntity.status = seat.status();
         seatEntity.seatNumber = seat.seatNumber();
-        seatEntity.seatOption = seat.seatOption();
-        seatEntity.concert = seat.concert();
+        seatEntity.seatOptionEntity = SeatOptionEntity.from(seat.seatOption());
+        seatEntity.concertEntity = ConcertEntity.from(seat.concert());
 
         return seatEntity;
     }
@@ -45,8 +45,8 @@ public class SeatEntity {
             .id(id)
             .status(status)
             .seatNumber(seatNumber)
-            .seatOption(seatOption)
-            .concert(concert)
+            .seatOption(seatOptionEntity.toModel())
+            .concert(concertEntity.toModel())
             .build();
     }
 }

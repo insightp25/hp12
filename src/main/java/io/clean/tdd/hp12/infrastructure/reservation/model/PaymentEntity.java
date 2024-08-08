@@ -3,6 +3,7 @@ package io.clean.tdd.hp12.infrastructure.reservation.model;
 import io.clean.tdd.hp12.domain.reservation.enums.PaymentStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Payment;
 import io.clean.tdd.hp12.domain.user.model.User;
+import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -26,8 +27,8 @@ public class PaymentEntity {
     LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    User user;
+    @JoinColumn(name = "user_id", nullable = false)
+    UserEntity userEntity;
 
     public static PaymentEntity from(Payment payment) {
         PaymentEntity paymentEntity = new PaymentEntity();
@@ -35,7 +36,7 @@ public class PaymentEntity {
         paymentEntity.amount = payment.amount();
         paymentEntity.status = payment.status();
         paymentEntity.createdAt = payment.createdAt();
-        paymentEntity.user = payment.user();
+        paymentEntity.userEntity = UserEntity.from(payment.user());
 
         return paymentEntity;
     }
@@ -46,7 +47,7 @@ public class PaymentEntity {
             .amount(amount)
             .status(status)
             .createdAt(createdAt)
-            .user(user)
+            .user(userEntity.toModel())
             .build();
     }
 }

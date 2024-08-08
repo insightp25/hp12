@@ -100,20 +100,25 @@ public class ReservationService {
     //(스케쥴러 사용)
     @Transactional
     public void bulkAbolishTimedOutOnHoldReservations() {
-        //1. 임시 상태의 예약 정보를 폐기 상태로 되돌린다
-        List<Reservation> abolishedReservations =
-            reservationRepository.bulkAbolishTimedOutOnHoldReservations(
-                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-                ReservationStatus.ON_HOLD);
+        //1. 폐기 대상 예약 정보를 조회한다
+        List<Reservation> reservations = reservationRepository.findAllByStatusAndExpireAtLessThanEqual(
+            ReservationStatus.ON_HOLD,
+            Reservation.generateBaseAbolishTimestamp());
 
-        //2. 대기 상태의 결제 정보를 폐기 상태로 되돌린다
+        //2. 임시 상태의 예약 정보를 폐기 상태로 되돌리고 저장한다
+        List<Reservation> abolishedReservations = reservations.stream()
+            .map(Reservation::abolishStatus)
+            .map(reservationRepository::save)
+            .toList();
+
+        //3. 대기 상태의 결제 정보를 폐기 상태로 되돌린다
         abolishedReservations.stream()
             .findFirst()
             .ifPresent(reservation -> {
                 paymentRepository.save(reservation.payment().abolish());
             });
 
-        //3. 임시 점유 상태 좌석을 사용 가능 상태로 되돌린다
+        //4. 임시 점유 상태 좌석을 사용 가능 상태로 되돌린다
         abolishedReservations.stream()
             .map(Reservation::seat)
             .map(Seat::vacate)

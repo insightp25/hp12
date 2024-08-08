@@ -18,14 +18,23 @@ public class ConcertEntity {
     LocalDateTime occasion;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    ConcertTitle concertTitle;
+    @JoinColumn(name = "concert_title_id", nullable = false)
+    ConcertTitleEntity concertTitleEntity;
+
+    public static ConcertEntity from(Concert concert) {
+        ConcertEntity concertEntity = new ConcertEntity();
+        concertEntity.id = concert.id();
+        concertEntity.occasion = concert.occasion();
+        concertEntity.concertTitleEntity = ConcertTitleEntity.from(concert.concertTitle());
+
+        return concertEntity;
+    }
 
     public Concert toModel() {
         return Concert.builder()
             .id(id)
             .occasion(occasion)
-            .concertTitle(concertTitle)
+            .concertTitle(concertTitleEntity.toModel())
             .build();
     }
 }

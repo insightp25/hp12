@@ -3,6 +3,7 @@ package io.clean.tdd.hp12.infrastructure.queue.entity;
 import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
 import io.clean.tdd.hp12.domain.queue.model.WaitingQueue;
 import io.clean.tdd.hp12.domain.user.model.User;
+import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -32,8 +33,8 @@ public class WaitingQueueEntity {
     LocalDateTime expireAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    User user;
+    @JoinColumn(name = "user_id", nullable = false)
+    UserEntity userEntity;
 
     public static WaitingQueueEntity from(WaitingQueue waitingQueue) {
         WaitingQueueEntity waitingQueueEntity = new WaitingQueueEntity();
@@ -43,7 +44,7 @@ public class WaitingQueueEntity {
         waitingQueueEntity.createdAt = waitingQueue.createdAt();
         waitingQueueEntity.lastAccessAt = waitingQueue.lastAccessAt();
         waitingQueueEntity.expireAt = waitingQueue.expireAt();
-        waitingQueueEntity.user = waitingQueue.user();
+        waitingQueueEntity.userEntity = UserEntity.from(waitingQueue.user());
 
         return waitingQueueEntity;
     }
@@ -56,7 +57,7 @@ public class WaitingQueueEntity {
             .createdAt(createdAt)
             .lastAccessAt(lastAccessAt)
             .expireAt(expireAt)
-            .user(user)
+            .user(userEntity.toModel())
             .build();
     }
 }

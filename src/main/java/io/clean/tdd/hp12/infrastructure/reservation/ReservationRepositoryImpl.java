@@ -24,13 +24,15 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public List<Reservation> findByPaymentId(long paymentId) {
-        return reservationJpaRepository.findByPayment_Id(paymentId).stream()
+        return reservationJpaRepository.findByPaymentEntity_Id(paymentId).stream()
             .map(ReservationEntity::toModel)
             .toList();
     }
 
     @Override
-    public List<Reservation> bulkAbolishTimedOutOnHoldReservations(LocalDateTime localDateTime, ReservationStatus status) {
-        return null;
+    public List<Reservation> findAllByStatusAndExpireAtLessThanEqual(ReservationStatus status, LocalDateTime abolishTimestamp) {
+        return reservationJpaRepository.findAllByStatusAndCreatedAtLessThanEqual(status, abolishTimestamp).stream()
+            .map(ReservationEntity::toModel)
+            .toList();
     }
 }

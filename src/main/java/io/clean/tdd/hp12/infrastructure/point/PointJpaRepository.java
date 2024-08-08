@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PointJpaRepository extends JpaRepository<PointEntity, Long> {
 
-    PointEntity findByUser_Id(long userId);
+    PointEntity findByUserEntity_Id(long userId);
 }

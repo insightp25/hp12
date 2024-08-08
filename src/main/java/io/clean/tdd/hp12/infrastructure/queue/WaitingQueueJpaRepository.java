@@ -14,5 +14,5 @@ public interface WaitingQueueJpaRepository extends JpaRepository<WaitingQueueEnt
 
     WaitingQueueEntity findFirstByStatusOrderByIdAsc(WaitingQueueStatus status);
 
-    WaitingQueueEntity findByUser_Id(long userId);
+    WaitingQueueEntity findByUserEntity_Id(long userId);
 }

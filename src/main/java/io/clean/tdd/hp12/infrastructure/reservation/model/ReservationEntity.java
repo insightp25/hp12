@@ -5,6 +5,8 @@ import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Payment;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.domain.user.model.User;
+import io.clean.tdd.hp12.infrastructure.concert.entity.SeatEntity;
+import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -25,25 +27,25 @@ public class ReservationEntity {
     LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    Seat seat;
+    @JoinColumn(name = "seat_id", nullable = false)
+    SeatEntity seatEntity;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    User user;
+    @JoinColumn(name = "user_id", nullable = false)
+    UserEntity userEntity;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    Payment payment;
+    @JoinColumn(name = "payment_id", nullable = false)
+    PaymentEntity paymentEntity;
 
     public static ReservationEntity from(Reservation reservation) {
         ReservationEntity reservationEntity = new ReservationEntity();
         reservationEntity.id = reservation.id();
         reservationEntity.status = reservation.status();
         reservationEntity.createdAt = reservation.createdAt();
-        reservationEntity.seat = reservation.seat();
-        reservationEntity.user = reservation.user();
-        reservationEntity.payment = reservation.payment();
+        reservationEntity.seatEntity = SeatEntity.from(reservation.seat());
+        reservationEntity.userEntity = UserEntity.from(reservation.user());
+        reservationEntity.paymentEntity = PaymentEntity.from(reservation.payment());
 
         return reservationEntity;
     }
@@ -53,9 +55,9 @@ public class ReservationEntity {
             .id(id)
             .status(status)
             .createdAt(createdAt)
-            .seat(seat)
-            .user(user)
-            .payment(payment)
+            .seat(seatEntity.toModel())
+            .user(userEntity.toModel())
+            .payment(paymentEntity.toModel())
             .build();
     }
 }

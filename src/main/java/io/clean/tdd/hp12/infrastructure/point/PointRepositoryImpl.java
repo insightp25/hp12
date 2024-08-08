@@ -14,11 +14,13 @@ public class PointRepositoryImpl implements PointRepository {
 
     @Override
     public Point getByUserId(long userId) {
-        return pointJpaRepository.findByUser_Id(userId).toModel();
+        return pointJpaRepository.findByUserEntity_Id(userId)
+            .toModel();
     }
 
     @Override
     public Point save(Point point) {
-        return pointJpaRepository.save(PointEntity.from(point)).toModel();
+        return pointJpaRepository.save(PointEntity.from(point))
+            .toModel();
     }
 }

@@ -1,5 +1,6 @@
 package io.clean.tdd.hp12.domain.reservation.model;
 
+import io.clean.tdd.hp12.common.BusinessPolicies;
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.user.model.User;
@@ -31,6 +32,12 @@ public record Reservation(
             .collect(Collectors.toList());
     }
 
+    public static LocalDateTime generateBaseAbolishTimestamp() {
+        return LocalDateTime.now()
+            .minusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES)
+            .truncatedTo(ChronoUnit.SECONDS);
+    }
+
     public Reservation finalizeStatus() {
         return Reservation.builder()
                 .status(ReservationStatus.FINALIZED)
@@ -39,5 +46,15 @@ public record Reservation(
                 .user(user)
                 .payment(payment)
                 .build();
+    }
+
+    public Reservation abolishStatus() {
+        return Reservation.builder()
+            .status(ReservationStatus.ABOLISHED)
+            .createdAt(createdAt)
+            .seat(seat)
+            .user(user)
+            .payment(payment)
+            .build();
     }
 }

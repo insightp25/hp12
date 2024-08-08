@@ -16,14 +16,14 @@ public class SeatRepositoryImpl implements SeatRepository {
 
     @Override
     public List<Seat> findByConcertId(long concertId) {
-        return seatJpaRepository.findByConcert_Id(concertId).stream()
+        return seatJpaRepository.findByConcertEntity_Id(concertId).stream()
             .map(SeatEntity::toModel)
             .toList();
     }
 
     @Override
     public Seat findByConcertIdAndSeatNumber(long concertId, int seatNumber) {
-        return seatJpaRepository.findByConcert_IdAndSeatNumber(concertId, seatNumber)
+        return seatJpaRepository.findByConcertEntity_IdAndSeatNumber(concertId, seatNumber)
             .toModel();
     }
 

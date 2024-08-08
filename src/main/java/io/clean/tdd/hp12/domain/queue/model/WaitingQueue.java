@@ -95,7 +95,7 @@ public record WaitingQueue(
             .status(status)
             .createdAt(createdAt)
             .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-            .expireAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusMinutes(BusinessPolicies.PAYMENT_DURATION_MINUTES))
+            .expireAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES))
             .user(user)
             .build();
     }

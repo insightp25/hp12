@@ -3,6 +3,7 @@ package io.clean.tdd.hp12.infrastructure.point.entity;
 import io.clean.tdd.hp12.domain.point.enums.TransactionType;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.user.model.User;
+import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -26,8 +27,8 @@ public class PointHistoryEntity {
     LocalDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
-    User user;
+    @JoinColumn(name = "user_id", nullable = false)
+    UserEntity userEntity;
 
     public static PointHistoryEntity from(PointHistory pointHistory) {
         PointHistoryEntity pointHistoryEntity = new PointHistoryEntity();
@@ -35,7 +36,7 @@ public class PointHistoryEntity {
         pointHistoryEntity.amount = pointHistory.amount();
         pointHistoryEntity.type = pointHistory.type();
         pointHistoryEntity.updatedAt = pointHistory.updatedAt();
-        pointHistoryEntity.user = pointHistory.user();
+        pointHistoryEntity.userEntity = UserEntity.from(pointHistory.user());
 
         return pointHistoryEntity;
     }
@@ -46,7 +47,7 @@ public class PointHistoryEntity {
             .amount(amount)
             .type(type)
             .updatedAt(updatedAt)
-            .user(user)
+            .user(userEntity.toModel())
             .build();
     }
 }

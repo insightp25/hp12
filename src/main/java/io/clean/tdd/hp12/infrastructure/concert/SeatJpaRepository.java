@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SeatJpaRepository extends JpaRepository<SeatEntity, Long> {
-    List<SeatEntity> findByConcert_Id(long concertId);
+    List<SeatEntity> findByConcertEntity_Id(long concertId);
 
-    SeatEntity findByConcert_IdAndSeatNumber(long concertId, int seatNumber);
+    SeatEntity findByConcertEntity_IdAndSeatNumber(long concertId, int seatNumber);
 }

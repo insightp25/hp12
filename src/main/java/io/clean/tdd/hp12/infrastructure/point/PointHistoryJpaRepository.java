@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface PointHistoryJpaRepository extends JpaRepository<PointHistoryEntity, Long> {
 
-    List<PointHistoryEntity> findAllByUser_Id(long userId);
+    List<PointHistoryEntity> findAllByUserEntity_Id(long userId);
 }

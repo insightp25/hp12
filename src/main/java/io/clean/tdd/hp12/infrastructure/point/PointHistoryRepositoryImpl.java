@@ -16,7 +16,7 @@ public class PointHistoryRepositoryImpl implements PointHistoryRepository {
 
     @Override
     public List<PointHistory> findAllByUserId(long userId) {
-        return pointHistoryJpaRepository.findAllByUser_Id(userId).stream()
+        return pointHistoryJpaRepository.findAllByUserEntity_Id(userId).stream()
             .map(PointHistoryEntity::toModel)
             .toList();
     }

@@ -41,7 +41,7 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
 
     @Override
     public WaitingQueue findByUserId(long userId) {
-        return waitingQueueJpaRepository.findByUser_Id(userId)
+        return waitingQueueJpaRepository.findByUserEntity_Id(userId)
             .toModel();
     }
 

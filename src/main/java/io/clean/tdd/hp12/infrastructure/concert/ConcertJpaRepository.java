@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ConcertJpaRepository extends JpaRepository<ConcertEntity, Long> {
-    List<ConcertEntity> findByConcertTitle_Id(long concertTitleId);
+    List<ConcertEntity> findByConcertTitleEntity_Id(long concertTitleId);
 
-    ConcertEntity findByConcertTitle_IdAndOccasion(long concertTitleId, LocalDateTime occasion);
+    ConcertEntity findByConcertTitleEntity_IdAndOccasion(long concertTitleId, LocalDateTime occasion);
 }
