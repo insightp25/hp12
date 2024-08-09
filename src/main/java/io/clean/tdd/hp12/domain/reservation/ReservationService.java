@@ -8,13 +8,18 @@ import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
 import io.clean.tdd.hp12.domain.point.port.PointRepository;
 import io.clean.tdd.hp12.domain.queue.model.WaitingQueue;
 import io.clean.tdd.hp12.domain.queue.port.WaitingQueueRepository;
+import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Payment;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.domain.reservation.port.PaymentRepository;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.domain.user.port.UserRepository;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +35,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final WaitingQueueRepository waitingQueueRepository;
 
+    @Transactional
     public List<Reservation> hold(long userId, long concertId, List<Integer> seatNumbers) {
         //1. seat: 예약을 희망하는 좌석(들)을 임시 점유 처리한다
         List<Seat> seats = seatNumbers.stream()
@@ -60,6 +66,7 @@ public class ReservationService {
         return reservations;
     }
 
+    @Transactional
     public List<Reservation> finalize(long userId, long paymentId, String accessKey) {
         //1. point: 유저의 현재 포인트 잔액을 조회한다 -> 부족할시 에러를 던진다
         Point point = pointRepository.getByUserId(userId);
@@ -88,5 +95,27 @@ public class ReservationService {
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
+    }
+
+    @Transactional
+    public void bulkAbolishTimedOutOnHoldReservations() {
+        //1. 임시 상태의 예약 정보를 폐기 상태로 되돌린다
+        List<Reservation> abolishedReservations =
+            reservationRepository.bulkAbolishTimedOutOnHoldReservations(
+                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+                ReservationStatus.ON_HOLD);
+
+        //2. 대기 상태의 결제 정보를 폐기 상태로 되돌린다
+        abolishedReservations.stream()
+            .findFirst()
+            .ifPresent(reservation -> {
+                paymentRepository.update(reservation.payment().abolish());
+            });
+
+        //3. 임시 점유 상태 좌석을 사용 가능 상태로 되돌린다
+        abolishedReservations.stream()
+            .map(Reservation::seat)
+            .map(Seat::vacate)
+            .forEach(seatRepository::update);
     }
 }

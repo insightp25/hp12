@@ -1,6 +1,6 @@
 package io.clean.tdd.hp12.domain.queue.model;
 
-import io.clean.tdd.hp12.common.TokenPolicies;
+import io.clean.tdd.hp12.common.BusinessPolicies;
 import io.clean.tdd.hp12.domain.common.CustomException;
 import io.clean.tdd.hp12.domain.common.ErrorCode;
 import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
@@ -18,7 +18,7 @@ public record WaitingQueue(
     WaitingQueueStatus status,
     LocalDateTime createdAt,
     LocalDateTime lastAccessAt,
-    LocalDateTime expiresAt,
+    LocalDateTime expireAt,
     User user
 ) {
     public static WaitingQueue issueOf(User user) {
@@ -26,7 +26,7 @@ public record WaitingQueue(
             .accessKey(UUID.randomUUID().toString())
             .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
             .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-            .expiresAt(LocalDateTime.now().plusMinutes(TokenPolicies.ISSUANCE_DURATION_MINUTES).truncatedTo(ChronoUnit.SECONDS))
+            .expireAt(LocalDateTime.now().plusMinutes(BusinessPolicies.WAITING_TOKEN_DURATION_MINUTES).truncatedTo(ChronoUnit.SECONDS))
             .user(user)
             .build();
     }
@@ -37,10 +37,23 @@ public record WaitingQueue(
         }
     }
 
-    public void verifyActivation(long tokenCountWaitingAhead) {
+    public boolean isActivated() {
+        return status.equals(WaitingQueueStatus.ACTIVE);
+    }
+
+    public WaitingQueue confirmActivation(long tokenCountWaitingAhead) {
         if (status.equals(WaitingQueueStatus.WAITING)) {
             throw new CustomException(ErrorCode.TOKEN_STATUS_WAITING_ERROR, "현재 대기 순번은 %d 번째입니다.".formatted(tokenCountWaitingAhead));
         }
+
+        return WaitingQueue.builder()
+            .id(id)
+            .accessKey(accessKey)
+            .status(status)
+            .createdAt(createdAt)
+            .lastAccessAt(lastAccessAt)
+            .user(user)
+            .build();
     }
 
     public long estimateNumberOfTokensAhead(long firstTokenId) {
@@ -48,8 +61,8 @@ public record WaitingQueue(
     }
 
     public boolean auditActivation(int activeStatusCount, long numberOfTokensAhead) {
-        return activeStatusCount < TokenPolicies.ACTIVATION_CAPACITY &&
-            numberOfTokensAhead < TokenPolicies.ACTIVATION_ORDER_TOLERANCE_INDEX;
+        return activeStatusCount < BusinessPolicies.TOKEN_ACTIVATION_CAPACITY &&
+            numberOfTokensAhead < BusinessPolicies.TOKEN_ACTIVATION_ORDER_DIFFERENCE_TOLERANCE;
     }
 
     public WaitingQueue refresh(boolean isActivationPermitted) {
@@ -57,10 +70,10 @@ public record WaitingQueue(
             return WaitingQueue.builder()
                 .id(id)
                 .accessKey(accessKey)
-                .status(WaitingQueueStatus.ACTIVE)
+                .status(WaitingQueueStatus.ACTIVE) // refreshed
                 .createdAt(createdAt)
-                .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-                .expiresAt(LocalDateTime.now().plusMinutes(TokenPolicies.ACTIVATION_DURATION_MINUTES).truncatedTo(ChronoUnit.SECONDS))
+                .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)) // refreshed
+                .expireAt(LocalDateTime.now().plusMinutes(BusinessPolicies.ACTIVE_TOKEN_DURATION_MINUTES).truncatedTo(ChronoUnit.SECONDS)) // refreshed
                 .user(user)
                 .build();
         } else {
@@ -69,7 +82,7 @@ public record WaitingQueue(
                 .accessKey(accessKey)
                 .status(status)
                 .createdAt(createdAt)
-                .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)) // refreshed
                 .user(user)
                 .build();
         }
@@ -82,7 +95,7 @@ public record WaitingQueue(
             .status(status)
             .createdAt(createdAt)
             .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-            .expiresAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusMinutes(TokenPolicies.PAYMENT_DURATION_MINUTES))
+            .expireAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusMinutes(BusinessPolicies.PAYMENT_DURATION_MINUTES))
             .user(user)
             .build();
     }
@@ -98,7 +111,7 @@ public record WaitingQueue(
             .status(WaitingQueueStatus.EXPIRED)
             .createdAt(createdAt)
             .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-            .expiresAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+            .expireAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
             .user(user)
             .build();
     }

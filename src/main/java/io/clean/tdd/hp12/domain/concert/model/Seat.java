@@ -38,4 +38,14 @@ public record Seat(
             .concert(concert)
             .build();
     }
+
+    public Seat vacate() {
+        return Seat.builder()
+            .id(id)
+            .status(SeatStatus.AVAILABLE)
+            .seatNumber(seatNumber)
+            .seatOption(seatOption)
+            .concert(concert)
+            .build();
+    }
 }
