@@ -38,6 +38,7 @@ SeatEntity findByConcertEntity_IdAndSeatNumber(long concertId, int seatNumber);
 // `status`가 `ACTIVE` 상태인 대기열토큰 수를 카운트
 int countByStatus(WaitingQueueStatus status);
 ```
+* `status` 인덱스 설정 고려(2-3-3. Query3에서 종합)
 
 <br>
 
@@ -46,6 +47,9 @@ int countByStatus(WaitingQueueStatus status);
 // `status`가 `WAITING` 상태인 대기열토큰들 중 가장 첫 번째 토큰을 조회
 WaitingQueueEntity findFirstByStatusOrderByIdAsc(WaitingQueueStatus status);
 ```
+* `status` 인덱스 설정 고려(2-3-3. Query3에서 종합)
+* `status`가 인덱스로 설정되어있을시 `status`조회 이후 대기열토큰의 순서는 auto-increment PK값으로 빠르게 찾을 수 있으므로 `status` 외 추가 인덱스 불필요
+
 
 <br>
 
@@ -63,6 +67,7 @@ List<WaitingQueueEntity> findAllByStatusAndExpireAtLessThanEqual(
     * 인덱스 결정 근거:
         * 설계상 `status`가 `ACTIVE`나 `WAITING` row들을 스케쥴러로 매우 잦은 빈도(매 5초)로 조회
         * 스케쥴러의 `cron` 설정 빈도(하루 1회)에 따라 만료된 row들은 주기적으로 삭제되므로 데이터 증가로 인한 인덱스 재조정 오버헤드 제한적
+        * 2-3-1. Query1과 2-3-2. Query2 등 다른 유즈케이스에서도 `status` 빈번히 조회
         * 대기열 사용자 경험상 빠른 조회와 실시간성의 중요성
 2. `expiredAt` -> 인덱스 보류
     * `expireAt`의 범위질의는 `findAllByStatusAndExpireAtLessThanEqual()`의 호출(`ACTIVE` 상태인 row를 조회)할 때만 발생하는데,
@@ -78,8 +83,8 @@ List<WaitingQueueEntity> findAllByStatusAndExpireAtLessThanEqual(
 ```java
 @Query("SELECT r FROM ReservationEntity r WHERE createdAt > abolishTimestampFrom AND r.createdAt <= :abolishTimestampUntil AND r.status = :status")
 List<ReservationEntity> findAllByStatusAndCreatedAtLessThanEqual(
-                @Param("abolishTimestampFrom") LocalDateTime abolishTimestampFrom,
-                @Param("abolishTimestampUntil") LocalDateTime abolishTimestampUntil,
+                @Param("abolishTimestampFrom") LocalDateTime abolishTimestampFrom, //범위 하한선을 정해 불필요한 스캔 축소
+                @Param("abolishTimestampUntil") LocalDateTime abolishTimestampUntil, //범위 상한
                 @Param("status") ReservationStatus status);
 ```
 * INDEX: `createdAt`, ~~`status`~~
@@ -134,10 +139,10 @@ void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱
         BASE_DATE_TIME
             .minusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES +
                 BusinessPolicies.TEMPORARY_RESERVATION_ABOLISH_DEFER_MINUTES)
-            .truncatedTo(ChronoUnit.SECONDS),
+            .truncatedTo(ChronoUnit.SECONDS), //timestamp 범위 하한
         BASE_DATE_TIME
             .minusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES)
-            .truncatedTo(ChronoUnit.SECONDS),
+            .truncatedTo(ChronoUnit.SECONDS), //timestamp 범위 상한
         ReservationStatus.ON_HOLD);
 
     long endTime = System.currentTimeMillis();
@@ -193,10 +198,10 @@ void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱
         BASE_DATE_TIME
             .minusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES +
                 BusinessPolicies.TEMPORARY_RESERVATION_ABOLISH_DEFER_MINUTES)
-            .truncatedTo(ChronoUnit.SECONDS),
+            .truncatedTo(ChronoUnit.SECONDS), //timestamp 범위 하한
         BASE_DATE_TIME
             .minusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES)
-            .truncatedTo(ChronoUnit.SECONDS),
+            .truncatedTo(ChronoUnit.SECONDS), //timestamp 범위 상한
         ReservationStatus.ON_HOLD);
 
     long endTime = System.currentTimeMillis();
