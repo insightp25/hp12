@@ -12,7 +12,7 @@ public class WaitingQueueScheduler {
 
     private final WaitingQueueService waitingQueueService;
 
-    @Scheduled(fixedRate = BusinessPolicies.EXPIRATION_SCHEDULING_INTERVAL_MINUTES * 1000)
+    @Scheduled(fixedRate = BusinessPolicies.EXPIRATION_SCHEDULING_INTERVAL_SECONDS * 1000)
     public void expireTimedOutTokens() {
         waitingQueueService.bulkExpireTimedOutTokens();
     }

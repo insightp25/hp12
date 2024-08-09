@@ -30,7 +30,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public List<Reservation> findAllByStatusAndExpireAtLessThanEqual(ReservationStatus status, LocalDateTime abolishTimestamp) {
+    public List<Reservation> findAllByStatusAndCreatedAtLessThanEqual(ReservationStatus status, LocalDateTime abolishTimestamp) {
         return reservationJpaRepository.findAllByStatusAndCreatedAtLessThanEqual(status, abolishTimestamp).stream()
             .map(ReservationEntity::toModel)
             .toList();

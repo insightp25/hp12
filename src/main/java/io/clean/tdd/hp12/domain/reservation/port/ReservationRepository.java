@@ -11,5 +11,5 @@ public interface ReservationRepository {
 
     List<Reservation> findByPaymentId(long paymentId);
 
-    List<Reservation> findAllByStatusAndExpireAtLessThanEqual(ReservationStatus status, LocalDateTime now);
+    List<Reservation> findAllByStatusAndCreatedAtLessThanEqual(ReservationStatus status, LocalDateTime now);
 }
