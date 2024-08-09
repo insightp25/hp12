@@ -54,8 +54,8 @@ WaitingQueueEntity findFirstByStatusOrderByIdAsc(WaitingQueueStatus status);
 // `status`가 `ACTIVE` 상태인 대기열토큰들 중 `expireAt`(timestamp)이 현재 시간 기준 경과한 토큰 목록 조회 
 @Query("SELECT w FROM WaitingQueueEntity w WHERE w.status = :status AND w.expireAt <= :now")
 List<WaitingQueueEntity> findAllByStatusAndExpireAtLessThanEqual(
-    @Param("status") WaitingQueueStatus status,
-    @Param("now") LocalDateTime now);
+        @Param("status") WaitingQueueStatus status,
+        @Param("now") LocalDateTime now);
 ```
 * INDEX: `status`, ~~`expireAt`~~
 1. `status` -> 인덱스 결정
@@ -115,7 +115,7 @@ List<ReservationEntity> findAllByStatusAndCreatedAtLessThanEqual(
 <br>
 
 ### 3-1-1. 인덱스 없이 batch 탐색 시간 측정
-* 탐색 실행 시간: 584 milliseconds
+* 탐색 실행 시간: `584 milliseconds`
 ```java
 // 테스트용 더미데이터 생성시 설정한 '현재시간'의 기준
 private static final LocalDateTime BASE_DATE_TIME = LocalDateTime.of(2024, 8, 1, 13, 0, 0).truncatedTo(
@@ -147,9 +147,10 @@ void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱
 <br>
 
 ### 3-1-2. 인덱스 추가후 batch 탐색 시간 측정
-* 탐색 실행 시간: 117 milliseconds
+* 탐색 실행 시간: `117 milliseconds`
+
 ```java
-//index 추가
+//index 추가 적용 코드
 @Entity
 @Table(name = "reservation", indexes = {
     @Index(name = "idx_created_at", columnList = "created_at")
@@ -159,7 +160,7 @@ public class ReservationEntity {
 }
 ```
 ```
-mysql> show index from reservation;
+# MySQL 콘솔 reservation table index 조회 결과
 +-------------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
 | Table       | Non_unique | Key_name                    | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
 +-------------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
@@ -171,6 +172,7 @@ mysql> show index from reservation;
 +-------------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
 ```
 ```java
+// 테스트 코드
 // 테스트용 더미데이터 생성시 설정한 '현재시간'의 기준
 private static final LocalDateTime BASE_DATE_TIME = LocalDateTime.of(2024, 8, 1, 13, 0, 0).truncatedTo(
         ChronoUnit.SECONDS);
@@ -202,4 +204,4 @@ void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱
 ## 3-2. 테스트 결과 및 결론
 
 * 2-4-1의 가정대로 `reservation`을 batch 조회하는 query에 index를 설정한 후 동일 데이터, 동일 쿼리에 대하여
-   * index 적용전 584 milliseconds 에서 -> 인덱스 적용후 117 milliseconds로 4.99배 향상되었음을 알 수 있었습니다.
+   * index 적용전 `584 milliseconds` 에서 -> 인덱스 적용후 `117 milliseconds`로, 읽기 속도 `4.99배` 증가, 성능을 `79.93%` 개션할  수 있었습니다.
