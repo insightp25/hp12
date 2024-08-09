@@ -3,8 +3,8 @@ spring:
     active: test
   datasource:
     url: jdbc:mysql://localhost:3306/concert
-    username: root
-    password: l$de11@0$ql
+    username:
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
