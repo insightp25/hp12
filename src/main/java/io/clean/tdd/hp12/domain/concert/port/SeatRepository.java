@@ -6,4 +6,8 @@ import java.util.List;
 
 public interface SeatRepository {
     List<Seat> findByConcertId(long id);
+
+    Seat findByConcertIdAndSeatNumber(long concertId, int seatNumber);
+
+    Seat update(Seat seat);
 }

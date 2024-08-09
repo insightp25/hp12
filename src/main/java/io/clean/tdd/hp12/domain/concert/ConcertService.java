@@ -19,7 +19,7 @@ public class ConcertService {
     private final ConcertTitleRepository concertTitleRepository;
     private final SeatRepository seatRepository;
 
-    public List<Concert> findAvailable(long concertTitleId) {
+    public List<Concert> find(long concertTitleId) {
         List<Concert> concerts = concertRepository.findByConcertTitleId(concertTitleId);
 
         return concerts.stream()

@@ -1,5 +1,7 @@
 package io.clean.tdd.hp12.domain.concert.model;
 
+import io.clean.tdd.hp12.domain.common.CustomException;
+import io.clean.tdd.hp12.domain.common.ErrorCode;
 import io.clean.tdd.hp12.domain.concert.enums.SeatStatus;
 import lombok.Builder;
 
@@ -11,4 +13,29 @@ public record Seat(
     SeatOption seatOption,
     Concert concert
 ) {
+    public void validateAvailabile() {
+        if (status.equals(SeatStatus.OCCUPIED)) {
+            throw new CustomException(ErrorCode.SEAT_OCCUPIED_ERROR, "좌석 %d 번".formatted(seatNumber()));
+        }
+    }
+
+    public Seat hold() {
+        return Seat.builder()
+            .id(id)
+            .status(SeatStatus.ON_HOLD)
+            .seatNumber(seatNumber)
+            .seatOption(seatOption)
+            .concert(concert)
+            .build();
+    }
+
+    public Seat close() {
+        return Seat.builder()
+            .id(id)
+            .status(SeatStatus.OCCUPIED)
+            .seatNumber(seatNumber)
+            .seatOption(seatOption)
+            .concert(concert)
+            .build();
+    }
 }

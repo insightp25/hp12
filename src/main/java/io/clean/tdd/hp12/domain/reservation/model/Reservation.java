@@ -6,6 +6,9 @@ import io.clean.tdd.hp12.domain.user.model.User;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 public record Reservation(
@@ -16,4 +19,25 @@ public record Reservation(
     User user,
     Payment payment
 ) {
+    public static List<Reservation> hold(List<Seat> seats, User user, Payment payment) {
+        return seats.stream()
+            .map(seat -> Reservation.builder()
+                .status(ReservationStatus.ON_HOLD)
+                .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                .seat(seat)
+                .user(user)
+                .payment(payment)
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    public Reservation finalizeStatus() {
+        return Reservation.builder()
+                .status(ReservationStatus.FINALIZED)
+                .createdAt(createdAt)
+                .seat(seat)
+                .user(user)
+                .payment(payment)
+                .build();
+    }
 }
