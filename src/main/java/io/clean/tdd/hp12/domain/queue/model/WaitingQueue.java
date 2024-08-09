@@ -57,7 +57,7 @@ public record WaitingQueue(
     }
 
     public long estimateNumberOfTokensAhead(long firstTokenId) {
-        return id - firstTokenId;
+        return BusinessPolicies.TOKEN_ACTIVATION_CAPACITY + id - firstTokenId;
     }
 
     public boolean auditActivation(int activeStatusCount, long numberOfTokensAhead) {
