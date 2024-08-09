@@ -13,6 +13,7 @@ public record Reservation(
     ReservationStatus status,
     LocalDateTime createdAt,
     Seat seat,
-    User user
+    User user,
+    Payment payment
 ) {
 }
