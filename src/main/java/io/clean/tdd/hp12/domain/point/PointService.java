@@ -20,10 +20,6 @@ public class PointService {
         return pointRepository.getByUserId(userId);
     }
 
-    public List<PointHistory> getHistoriesOf(long userId) {
-        return pointHistoryRepository.findAllByUserId(userId);
-    }
-
     public Point charge(long userId, long amount) {
         Point.validate(amount);
 
@@ -48,5 +44,9 @@ public class PointService {
         pointHistoryRepository.save(PointHistory.generateUseTypeOf(deductedPoint.user(), amount));
 
         return deductedPoint;
+    }
+
+    public List<PointHistory> getHistoriesOf(long userId) {
+        return pointHistoryRepository.findAllByUserId(userId);
     }
 }

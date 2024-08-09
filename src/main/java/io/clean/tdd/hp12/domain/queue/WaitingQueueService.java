@@ -17,12 +17,19 @@ public class WaitingQueueService {
     private final WaitingQueueRepository waitingQueueRepository;
     private final UserRepository userRepository;
 
-    //(인터셉터에서 사용)
+    public WaitingQueue push(long userId) {
+        User user = userRepository.getById(userId);
+
+        return waitingQueueRepository.save(WaitingQueue.issueOf(user));
+    }
+
+    //(인터셉터 사용)
     public WaitingQueue get(String accessKey) {
         return waitingQueueRepository.getByAccessKey(accessKey);
     }
 
-    public WaitingQueue activate(WaitingQueue token) {
+    //(인터셉터 사용)
+    public void activate(WaitingQueue token) {
         //1. 현재 활성중인 토큰 개수를 센다
         int activeTokenCount = waitingQueueRepository.getActiveStatusCount();
 
@@ -38,15 +45,10 @@ public class WaitingQueueService {
         waitingQueueRepository.update(refreshedToken);
 
         //5. 위 단계에서 활성을 진행하지 못했을시 대기 순번 정보와 함께 오류를 반환한다
-        return refreshedToken.confirmActivation(tokenCountWaitingAhead);
+        refreshedToken.confirmActivation(tokenCountWaitingAhead);
     }
 
-    public WaitingQueue push(long userId) {
-        User user = userRepository.getById(userId);
-
-        return waitingQueueRepository.save(WaitingQueue.issueOf(user));
-    }
-
+    //(스케쥴러 사용)
     public void bulkExpireTimedOutTokens() {
         waitingQueueRepository.bulkExpire(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     }

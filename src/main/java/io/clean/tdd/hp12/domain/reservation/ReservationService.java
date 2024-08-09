@@ -97,6 +97,7 @@ public class ReservationService {
         return finalizedReservations;
     }
 
+    //(스케쥴러 사용)
     @Transactional
     public void bulkAbolishTimedOutOnHoldReservations() {
         //1. 임시 상태의 예약 정보를 폐기 상태로 되돌린다

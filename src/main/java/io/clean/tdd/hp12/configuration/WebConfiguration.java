@@ -2,6 +2,7 @@ package io.clean.tdd.hp12.configuration;
 
 import io.clean.tdd.hp12.interfaces.common.WaitingQueueInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.List;
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 public class WebConfiguration implements WebMvcConfigurer {
 
