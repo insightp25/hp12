@@ -15,8 +15,6 @@ import io.clean.tdd.hp12.domain.reservation.port.PaymentRepository;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.domain.user.port.UserRepository;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import jakarta.transaction.Transactional;
@@ -102,8 +100,9 @@ public class ReservationService {
     public void bulkAbolishTimedOutOnHoldReservations() {
         //1. 폐기 대상 예약 정보를 조회한다
         List<Reservation> reservations = reservationRepository.findAllByStatusAndCreatedAtLessThanEqual(
-            ReservationStatus.ON_HOLD,
-            Reservation.generateBaseAbolishTimestamp());
+            Reservation.generateBaseAbolishTimestampFrom(),
+            Reservation.generateBaseAbolishTimestampUntil(),
+            ReservationStatus.ON_HOLD);
 
         //2. 임시 상태의 예약 정보를 폐기 상태로 되돌리고 저장한다
         List<Reservation> abolishedReservations = reservations.stream()

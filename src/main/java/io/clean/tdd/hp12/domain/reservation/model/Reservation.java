@@ -32,7 +32,14 @@ public record Reservation(
             .collect(Collectors.toList());
     }
 
-    public static LocalDateTime generateBaseAbolishTimestamp() {
+    public static LocalDateTime generateBaseAbolishTimestampFrom() {
+        return LocalDateTime.now()
+            .minusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES +
+                BusinessPolicies.TEMPORARY_RESERVATION_ABOLISH_DEFER_MINUTES)
+            .truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    public static LocalDateTime generateBaseAbolishTimestampUntil() {
         return LocalDateTime.now()
             .minusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES)
             .truncatedTo(ChronoUnit.SECONDS);
