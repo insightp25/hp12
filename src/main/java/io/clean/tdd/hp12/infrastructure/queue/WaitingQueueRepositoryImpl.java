@@ -4,6 +4,7 @@ import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
 import io.clean.tdd.hp12.domain.queue.model.WaitingQueue;
 import io.clean.tdd.hp12.domain.queue.port.WaitingQueueRepository;
 import io.clean.tdd.hp12.infrastructure.queue.entity.WaitingQueueEntity;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -46,7 +47,9 @@ public class WaitingQueueRepositoryImpl implements WaitingQueueRepository {
     }
 
     @Override
-    public void bulkExpire(LocalDateTime localDateTime) {
-
+    public List<WaitingQueue> findAllByStatusAndExpireAtLessThanEqual(WaitingQueueStatus status, LocalDateTime now) {
+        return waitingQueueJpaRepository.findAllByStatusAndExpireAtLessThanEqual(status, now).stream()
+            .map(WaitingQueueEntity::toModel)
+            .toList();
     }
 }
