@@ -2,7 +2,6 @@
 
 * 대기열 설계는 은행 창구식(활성 토큰 수 상한 고정)으로 구현하였습니다.
 * 테스트는 애플리케이션의 슬로우 쿼리를 분석후 `reservation` 테이블과 `waiting_queue` 테이블의 각 쿼리 한 개씩을 선정하여 인덱스 적용 전과 적용 후의 탐색 시간을 측정 및 비교하였습니다.
-* 쿼리 최적화와 직접 연관이 없는 컬럼값들은 동일 로우(엔티티)로 갈음하였습니다.
 
 <br><br>
 
@@ -54,15 +53,15 @@ List<WaitingQueueEntity> findAllByStatusAndExpireAtLessThanEqual(
 ```
 * INDEX: `status`, ~~`expireAt`~~
 1. `status` -> 인덱스 결정
-   * `status`는 빈번히 수정되어 인덱스 재조정 빈도가 높고, 카디널리티가 매우 낮으므로(`ACTIVE`, `WAITING`, `EXPIRED` 3가지 경우만 존재) 인덱스로 설정할지를 고민
-   * 인덱스 결정 근거:
-      * 설계상 `status`가 `ACTIVE`나 `WAITING` row들을 스케쥴러로 매우 잦은 빈도(매 5초)로 조회
-      * 스케쥴러의 `cron` 설정 빈도(하루 1회)에 따라 만료된 row들은 주기적으로 삭제되므로 데이터 증가로 인한 인덱스 재조정 오버헤드 제한적
-      * 대기열 사용자 경험상 빠른 조회와 실시간성의 중요성
+    * `status`는 빈번히 수정되어 인덱스 재조정 빈도가 높고, 카디널리티가 매우 낮으므로(`ACTIVE`, `WAITING`, `EXPIRED` 3가지 경우만 존재) 인덱스로 설정할지를 고민
+    * 인덱스 결정 근거:
+        * 설계상 `status`가 `ACTIVE`나 `WAITING` row들을 스케쥴러로 매우 잦은 빈도(매 5초)로 조회
+        * 스케쥴러의 `cron` 설정 빈도(하루 1회)에 따라 만료된 row들은 주기적으로 삭제되므로 데이터 증가로 인한 인덱스 재조정 오버헤드 제한적
+        * 대기열 사용자 경험상 빠른 조회와 실시간성의 중요성
 2. `expiredAt` -> 인덱스 보류
-   * `expireAt`의 범위질의는 `findAllByStatusAndExpireAtLessThanEqual()`의 호출(`ACTIVE` 상태인 row를 조회)할 때만 발생하는데,
-      * 설계상 `status`가 `ACTIVE`한 로우의 수는 상한이 상수(50명~)로 고정되어 있어 매우 작은 모수를 유지합니다. -> 풀스캔시에도 최대 50개로 비용이 거의 발생하지 않습니다.
-      * 반면 `expireAt` 복합 인덱스 추가시 `ACTIVE` 상태인 로우 외의 (테이블 전체의 거의 대부분을 차지하는)`WAITING`이나 `EXPIRED` 상태의 row에 대해서 까지 불필요한 인덱스 재조정이 일어납니다.
+    * `expireAt`의 범위질의는 `findAllByStatusAndExpireAtLessThanEqual()`의 호출(`ACTIVE` 상태인 row를 조회)할 때만 발생하는데,
+        * 설계상 `status`가 `ACTIVE`한 로우의 수는 상한이 상수(50명~)로 고정되어 있어 매우 작은 모수를 유지합니다. -> 풀스캔시에도 최대 50개로 비용이 거의 발생하지 않습니다.
+        * 반면 `expireAt` 복합 인덱스 추가시 `ACTIVE` 상태인 로우 외의 (테이블 전체의 거의 대부분을 차지하는)`WAITING`이나 `EXPIRED` 상태의 row에 대해서 까지 불필요한 인덱스 재조정이 일어납니다.
 
 
 
@@ -79,13 +78,13 @@ List<ReservationEntity> findAllByStatusAndCreatedAtLessThanEqual(
 ```
 * INDEX: `createdAt`, ~~`status`~~
 1. `createdAt` -> 인덱스 결정
-   * 인덱스 결정 근거:
-      * timestamp와 `status`를 조건으로 탐색한다는 점과 극히 적은 모수의 타겟(50건 이하의 토큰 활성화중 or 임시예약중)을 탐색한다는 점이 2-3-3의 query와 유사하지만, 결정적으로 다른 점은 `reservation` 테이블은 데이터가 삭제되지 않고 계속해서 축적된다는 점이었습니다.
-      * `createdAt`은 카디널리티가 높고 순차성이 있어 범위 탐색에 효과적이고
-      * 향후 `reservation` 내역 조회나 데이터 분석 등 요구사항 확장시 효용성이 있을 것으로 판단했습니다.
+    * 인덱스 결정 근거:
+        * timestamp와 `status`를 조건으로 탐색한다는 점과 극히 적은 모수의 타겟(50건 이하의 토큰 활성화중 or 임시예약중)을 탐색한다는 점이 2-3-3의 query와 유사하지만, 결정적으로 다른 점은 `reservation` 테이블은 데이터가 삭제되지 않고 계속해서 축적된다는 점이었습니다.
+        * `createdAt`은 카디널리티가 높고 순차성이 있어 범위 탐색에 효과적이고
+        * 향후 `reservation` 내역 조회나 데이터 분석 등 요구사항 확장시 효용성이 있을 것으로 판단했습니다.
 2. `status` -> 인덱스 보류
-   * `reservation` 데이터가 계속 쌓임에 따라 `status`의 인덱스를 유지하는 비용이 효용보다 크다고 판단해 보류하였습니다.
-    
+    * `reservation` 데이터가 계속 쌓임에 따라 `status`의 인덱스를 유지하는 비용이 효용보다 크다고 판단해 보류하였습니다.
+
 <br><br>
 
 # 3. 테스트 결과
@@ -110,6 +109,10 @@ List<ReservationEntity> findAllByStatusAndCreatedAtLessThanEqual(
 ### 3-1-1. 인덱스 없이 batch 탐색 시간 측정
 * 탐색 실행 시간: 584 milliseconds
 ```java
+// 테스트용 더미데이터 생성시 설정한 '현재시간'의 기준
+private static final LocalDateTime BASE_DATE_TIME = LocalDateTime.of(2024, 8, 1, 13, 0, 0).truncatedTo(
+        ChronoUnit.SECONDS);
+
 @Test
 void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱스_없이_탐색하고_수행시간을_출력한다() {
     long startTime = System.currentTimeMillis();
@@ -157,6 +160,10 @@ mysql> show index from reservation;
 +-------------+------------+-----------------------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
 ```
 ```java
+// 테스트용 더미데이터 생성시 설정한 '현재시간'의 기준
+private static final LocalDateTime BASE_DATE_TIME = LocalDateTime.of(2024, 8, 1, 13, 0, 0).truncatedTo(
+        ChronoUnit.SECONDS);
+
 @Test
 void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱스를_추가한_후_탐색하고_수행시간을_출력한다() {
     long startTime = System.currentTimeMillis();
@@ -179,7 +186,9 @@ void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱
 }
 ```
 
+<br><br>
+
 ## 3-2. 테스트 결과 및 결론
 
 * 2-4-1의 가정대로 `reservation`을 batch 조회하는 query에 index를 설정한 후 동일 데이터, 동일 쿼리에 대하여
-  * index 적용전 584 milliseconds 에서 -> 인덱스 적용후 117 milliseconds로 4.99배 향상되었음을 알 수 있었습니다.
+    * index 적용전 584 milliseconds 에서 -> 인덱스 적용후 117 milliseconds로 4.99배 향상되었음을 알 수 있었습니다.
