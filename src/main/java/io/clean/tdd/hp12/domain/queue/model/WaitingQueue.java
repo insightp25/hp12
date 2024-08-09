@@ -95,23 +95,23 @@ public record WaitingQueue(
             .status(status)
             .createdAt(createdAt)
             .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-            .expireAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusMinutes(BusinessPolicies.PAYMENT_DURATION_MINUTES))
+            .expireAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).plusMinutes(BusinessPolicies.TEMPORARY_RESERVATION_DURATION_MINUTES))
             .user(user)
             .build();
     }
 
     public WaitingQueue expire() {
-        if (status == WaitingQueueStatus.EXPIRED) {
-            throw new CustomException(ErrorCode.TOKEN_STATUS_EXPIRED_ERROR);
-        }
-
+        //불필요하다고 판단, 제거
+        //if (status == WaitingQueueStatus.EXPIRED) {
+        //    throw new CustomException(ErrorCode.TOKEN_STATUS_EXPIRED_ERROR);
+        //}
         return WaitingQueue.builder()
             .id(id)
             .accessKey(accessKey)
             .status(WaitingQueueStatus.EXPIRED)
             .createdAt(createdAt)
             .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-            .expireAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+            .expireAt(expireAt)
             .user(user)
             .build();
     }

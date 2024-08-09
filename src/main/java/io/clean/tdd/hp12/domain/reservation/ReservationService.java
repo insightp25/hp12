@@ -44,7 +44,7 @@ public class ReservationService {
         seats.forEach(Seat::validateAvailabile);
         List<Seat> seatsOnHold = seats.stream()
             .map(Seat::hold)
-            .map(seatRepository::update)
+            .map(seatRepository::save)
             .toList();
 
         //2. 결제 정보를 생성후 저장한다
@@ -56,7 +56,7 @@ public class ReservationService {
         //3. 임시 예약하는 현재 시점에서 대기열의 만료 시간을 정책시간 만큼 업데이트 한다.
         WaitingQueue token = waitingQueueRepository.findByUserId(user.id());
         WaitingQueue refreshedToken = token.refreshForPayment();
-        waitingQueueRepository.update(refreshedToken);
+        waitingQueueRepository.save(refreshedToken);
 
         //4. 임시 예약 정보를 생성후 저장한다
         List<Reservation> reservations = Reservation.hold(seatsOnHold, user, payment);
@@ -83,15 +83,15 @@ public class ReservationService {
             .map(reservationRepository::save)
             .toList();
 
-        //4. seat: 좌석의 상태를 완료로 변경한다
+        //4. seat: 좌석의 상태를 '점유'로 변경한다
         finalizedReservations.stream()
             .map(Reservation::seat)
             .map(Seat::close)
-            .forEach(seatRepository::update);
+            .forEach(seatRepository::save);
 
         //5. waiting queue: 대기 토큰을 만료한다
-        WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire();
-        waitingQueueRepository.update(expiredToken);
+        WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
+        waitingQueueRepository.save(expiredToken);
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
@@ -100,23 +100,28 @@ public class ReservationService {
     //(스케쥴러 사용)
     @Transactional
     public void bulkAbolishTimedOutOnHoldReservations() {
-        //1. 임시 상태의 예약 정보를 폐기 상태로 되돌린다
-        List<Reservation> abolishedReservations =
-            reservationRepository.bulkAbolishTimedOutOnHoldReservations(
-                LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-                ReservationStatus.ON_HOLD);
+        //1. 폐기 대상 예약 정보를 조회한다
+        List<Reservation> reservations = reservationRepository.findAllByStatusAndCreatedAtLessThanEqual(
+            ReservationStatus.ON_HOLD,
+            Reservation.generateBaseAbolishTimestamp());
 
-        //2. 대기 상태의 결제 정보를 폐기 상태로 되돌린다
+        //2. 임시 상태의 예약 정보를 폐기 상태로 되돌리고 저장한다
+        List<Reservation> abolishedReservations = reservations.stream()
+            .map(Reservation::abolishStatus)
+            .map(reservationRepository::save)
+            .toList();
+
+        //3. 대기 상태의 결제 정보를 폐기 상태로 되돌린다
         abolishedReservations.stream()
             .findFirst()
             .ifPresent(reservation -> {
-                paymentRepository.update(reservation.payment().abolish());
+                paymentRepository.save(reservation.payment().abolish());
             });
 
-        //3. 임시 점유 상태 좌석을 사용 가능 상태로 되돌린다
+        //4. 임시 점유 상태 좌석을 사용 가능 상태로 되돌린다
         abolishedReservations.stream()
             .map(Reservation::seat)
             .map(Seat::vacate)
-            .forEach(seatRepository::update);
+            .forEach(seatRepository::save);
     }
 }

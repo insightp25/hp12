@@ -5,9 +5,9 @@ import io.clean.tdd.hp12.domain.concert.model.Seat;
 import java.util.List;
 
 public interface SeatRepository {
-    List<Seat> findByConcertId(long id);
+    List<Seat> findByConcertId(long concertId);
 
     Seat findByConcertIdAndSeatNumber(long concertId, int seatNumber);
 
-    Seat update(Seat seat);
+    Seat save(Seat seat);
 }

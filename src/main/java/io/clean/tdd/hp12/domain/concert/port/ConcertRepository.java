@@ -9,4 +9,6 @@ public interface ConcertRepository {
     List<Concert> findByConcertTitleId(long concertTitleId);
 
     Concert findByConcertTitleIdAndOccasion(long concertTitleId, LocalDateTime occasion);
+
+    Concert save(Concert concert);
 }
