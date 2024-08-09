@@ -26,3 +26,5 @@ spring:
               descriptor:
                 sql:
                   BasicBinder: TRACE
+
+
