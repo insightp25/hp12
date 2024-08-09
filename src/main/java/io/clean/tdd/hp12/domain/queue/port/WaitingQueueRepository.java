@@ -3,7 +3,9 @@ package io.clean.tdd.hp12.domain.queue.port;
 import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
 import io.clean.tdd.hp12.domain.queue.model.WaitingQueue;
 
+import io.clean.tdd.hp12.infrastructure.queue.entity.WaitingQueueEntity;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface WaitingQueueRepository {
@@ -18,5 +20,5 @@ public interface WaitingQueueRepository {
 
     WaitingQueue findByUserId(long userId);
 
-    void bulkExpire(LocalDateTime localDateTime);
+    List<WaitingQueue> findAllByStatusAndExpireAtLessThanEqual(WaitingQueueStatus status, LocalDateTime now);
 }
