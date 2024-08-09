@@ -83,14 +83,14 @@ public class ReservationService {
             .map(reservationRepository::save)
             .toList();
 
-        //4. seat: 좌석의 상태를 완료로 변경한다
+        //4. seat: 좌석의 상태를 '점유'로 변경한다
         finalizedReservations.stream()
             .map(Reservation::seat)
             .map(Seat::close)
             .forEach(seatRepository::save);
 
         //5. waiting queue: 대기 토큰을 만료한다
-        WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire();
+        WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
         waitingQueueRepository.save(expiredToken);
 
         //6. 완료된 예약 정보를 반환한다
@@ -101,7 +101,7 @@ public class ReservationService {
     @Transactional
     public void bulkAbolishTimedOutOnHoldReservations() {
         //1. 폐기 대상 예약 정보를 조회한다
-        List<Reservation> reservations = reservationRepository.findAllByStatusAndExpireAtLessThanEqual(
+        List<Reservation> reservations = reservationRepository.findAllByStatusAndCreatedAtLessThanEqual(
             ReservationStatus.ON_HOLD,
             Reservation.generateBaseAbolishTimestamp());
 

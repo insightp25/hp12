@@ -7,6 +7,7 @@ import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.domain.user.port.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,14 @@ public class WaitingQueueService {
 
     //(스케쥴러 사용)
     public void bulkExpireTimedOutTokens() {
-        waitingQueueRepository.bulkExpire(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        // 토큰이 ACTIVE 상태이며 expireAt이 현재 시간을 경과한 토큰 목록을 조회한다
+        List<WaitingQueue> waitingQueues = waitingQueueRepository.findAllByStatusAndExpireAtLessThanEqual(
+            WaitingQueueStatus.ACTIVE,
+            LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+        //토큰 상태를 만료로 업데이트후 저장한다
+        waitingQueues.stream()
+            .map(WaitingQueue::expire)
+            .forEach(waitingQueueRepository::save);
     }
 }
