@@ -11,6 +11,6 @@ public interface ReservationRepository {
 
     List<Reservation> findByPaymentId(long paymentId);
 
-    List<Reservation> findAllByStatusAndCreatedAtLessThanEqual(LocalDateTime abolishTimestampFrom,
+    List<Reservation> findAllByCreatedAtBetweenAndStatus(LocalDateTime abolishTimestampFrom,
         LocalDateTime abolishTimestampUntil, ReservationStatus status);
 }

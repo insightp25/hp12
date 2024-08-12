@@ -13,8 +13,8 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationEntit
 
     List<ReservationEntity> findByPaymentEntity_Id(long paymentId);
 
-    @Query("SELECT r FROM ReservationEntity r WHERE createdAt > :abolishTimestampFrom AND r.createdAt <= :abolishTimestampUntil AND r.status = :status")
-    List<ReservationEntity> findAllByStatusAndCreatedAtLessThanEqual(
+    @Query("SELECT r FROM ReservationEntity r WHERE r.createdAt BETWEEN :abolishTimestampFrom AND :abolishTimestampUntil AND r.status = :status")
+    List<ReservationEntity> findAllByCreatedAtBetweenAndStatus(
         @Param("abolishTimestampFrom") LocalDateTime abolishTimestampFrom,
         @Param("abolishTimestampUntil") LocalDateTime abolishTimestampUntil,
         @Param("status") ReservationStatus status);

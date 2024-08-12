@@ -106,7 +106,7 @@ public class ReservationService {
     @Transactional
     public void bulkAbolishTimedOutOnHoldReservations() {
         //1. 폐기 대상 예약 정보를 조회한다
-        List<Reservation> reservations = reservationRepository.findAllByStatusAndCreatedAtLessThanEqual(
+        List<Reservation> reservations = reservationRepository.findAllByCreatedAtBetweenAndStatus(
             Reservation.generateBaseAbolishTimestampFrom(),
             Reservation.generateBaseAbolishTimestampUntil(),
             ReservationStatus.ON_HOLD);
