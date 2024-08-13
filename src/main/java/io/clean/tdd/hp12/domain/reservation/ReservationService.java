@@ -34,7 +34,9 @@ public class ReservationService {
     private final PointHistoryRepository pointHistoryRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingQueueRepository waitingQueueRepository;
+
     private final ApplicationEventPublisher applicationEventPublisher;
+
 
     @Transactional
     public List<Reservation> hold(long userId, long concertId, List<Integer> seatNumbers) {
@@ -94,9 +96,8 @@ public class ReservationService {
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
         waitingQueueRepository.save(expiredToken);
 
-        //(data platform 으로 reservation 정보 전송)
-        finalizedReservations
-                .forEach(reservation -> applicationEventPublisher.publishEvent(new ReservationDataEvent(reservation)));
+        //6. 외부 data platform 으로 완료된 reservation 전송 메시지 발행
+        finalizedReservations.forEach(reservationRepository::produceReservationMessage);
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;

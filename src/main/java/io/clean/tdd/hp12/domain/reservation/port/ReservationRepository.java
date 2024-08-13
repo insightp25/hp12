@@ -13,4 +13,6 @@ public interface ReservationRepository {
 
     List<Reservation> findAllByCreatedAtBetweenAndStatus(LocalDateTime abolishTimestampFrom,
         LocalDateTime abolishTimestampUntil, ReservationStatus status);
+
+    public void produceReservationMessage(Reservation reservation);
 }
