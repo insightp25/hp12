@@ -2,6 +2,7 @@ package io.clean.tdd.hp12.domain.reservation;
 
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
+import io.clean.tdd.hp12.domain.data.event.ReservationDataEvent;
 import io.clean.tdd.hp12.domain.point.model.Point;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +34,7 @@ public class ReservationService {
     private final PointHistoryRepository pointHistoryRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingQueueRepository waitingQueueRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public List<Reservation> hold(long userId, long concertId, List<Integer> seatNumbers) {
@@ -91,6 +94,10 @@ public class ReservationService {
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
         waitingQueueRepository.save(expiredToken);
 
+        //(data platform 으로 reservation 정보 전송)
+        finalizedReservations
+                .forEach(reservation -> applicationEventPublisher.publishEvent(new ReservationDataEvent(reservation)));
+
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
     }
@@ -99,7 +106,7 @@ public class ReservationService {
     @Transactional
     public void bulkAbolishTimedOutOnHoldReservations() {
         //1. 폐기 대상 예약 정보를 조회한다
-        List<Reservation> reservations = reservationRepository.findAllByStatusAndCreatedAtLessThanEqual(
+        List<Reservation> reservations = reservationRepository.findAllByCreatedAtBetweenAndStatus(
             Reservation.generateBaseAbolishTimestampFrom(),
             Reservation.generateBaseAbolishTimestampUntil(),
             ReservationStatus.ON_HOLD);

@@ -30,10 +30,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public List<Reservation> findAllByStatusAndCreatedAtLessThanEqual(
+    public List<Reservation> findAllByCreatedAtBetweenAndStatus(
         LocalDateTime abolishTimestampFrom, LocalDateTime abolishTimestampUntil, ReservationStatus status) {
         return reservationJpaRepository
-            .findAllByStatusAndCreatedAtLessThanEqual(abolishTimestampFrom, abolishTimestampUntil, status)
+            .findAllByCreatedAtBetweenAndStatus(abolishTimestampFrom, abolishTimestampUntil, status)
             .stream()
             .map(ReservationEntity::toModel)
             .toList();
