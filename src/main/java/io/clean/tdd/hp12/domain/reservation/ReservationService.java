@@ -2,7 +2,7 @@ package io.clean.tdd.hp12.domain.reservation;
 
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
-import io.clean.tdd.hp12.domain.data.event.ReservationCompletionEvent;
+import io.clean.tdd.hp12.domain.reservation.event.ReservationCompletionEvent;
 import io.clean.tdd.hp12.domain.point.model.Point;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
@@ -81,9 +81,10 @@ public class ReservationService {
         pointHistoryRepository.save(PointHistory.generateUseTypeOf(deductedPoint.user(), payment.amount()));
 
         //3. reservation: 예약의 상태를 완료로 변경후 저장한다
+        //reservation_outbox 데이터 생성후 함께 저장(domain 에서 outbox 존재 모르도록 구현)
         List<Reservation> finalizedReservations = reservationRepository.findByPaymentId(paymentId).stream()
             .map(Reservation::finalizeStatus)
-            .map(reservationRepository::save)
+            .map(reservationRepository::save) //reservation_outbox 데이터 함께 저장
             .toList();
 
         //4. seat: 좌석의 상태를 '점유'로 변경한다
@@ -98,7 +99,7 @@ public class ReservationService {
 
         //(data platform 으로 reservation 정보 전송)
         finalizedReservations
-            .forEach(reservation -> applicationEventPublisher.publishEvent(new ReservationCompletionEvent(reservation)));
+            .forEach(finalizedReservation -> applicationEventPublisher.publishEvent(new ReservationCompletionEvent(finalizedReservation)));
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;

@@ -1,5 +1,6 @@
 package io.clean.tdd.hp12.infrastructure.reservation.model;
 
+import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.infrastructure.reservation.enums.ReservationOutboxStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "reservation_outbox", indexes = {
@@ -31,10 +33,25 @@ public class ReservationOutboxEntity {
     @Column(nullable = false)
     LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    LocalDateTime updatedAt;
+    LocalDateTime publishedAt;
 
     @OneToOne
     @JoinColumn(name = "reservation_id", nullable = false)
     ReservationEntity reservationEntity;
+
+    public static ReservationOutboxEntity issueOutboxMessage(Reservation reservation) {
+        ReservationOutboxEntity reservationOutboxEntity = new ReservationOutboxEntity();
+        reservationOutboxEntity.status = ReservationOutboxStatus.CREATED;
+        reservationOutboxEntity.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        reservationOutboxEntity.reservationEntity = ReservationEntity.from(reservation);
+
+        return reservationOutboxEntity;
+    }
+
+    public ReservationOutboxEntity toPublishedStatus() {
+        this.status = ReservationOutboxStatus.PUBLISHED;
+        this.publishedAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+
+        return this;
+    }
 }

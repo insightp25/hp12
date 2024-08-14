@@ -5,6 +5,7 @@ import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationOutboxEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,7 +18,6 @@ import java.util.List;
 public class ReservationRepositoryImpl implements ReservationRepository {
 
     private final ReservationJpaRepository reservationJpaRepository;
-    private final KafkaTemplate<Long, Reservation> reservationKafkaTemplate;
 
     @Override
     public Reservation save(Reservation reservation) {
@@ -40,10 +40,5 @@ public class ReservationRepositoryImpl implements ReservationRepository {
             .stream()
             .map(ReservationEntity::toModel)
             .toList();
-    }
-
-    @Override
-    public void produceReservationMessage(Reservation reservation) {
-        reservationKafkaTemplate.send(MessageTopics.RESERVATIONS, reservation.id(), reservation);
     }
 }
