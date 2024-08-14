@@ -12,7 +12,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reservation")
+@Table(name = "reservation", indexes = {
+    @Index(name = "idx_created_at", columnList = "created_at")
+})
 public class ReservationEntity {
 
     @Id
