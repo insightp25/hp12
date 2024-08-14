@@ -2,7 +2,7 @@ package io.clean.tdd.hp12.domain.reservation;
 
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
-import io.clean.tdd.hp12.domain.data.event.ReservationDataEvent;
+import io.clean.tdd.hp12.domain.data.event.ReservationCompletionEvent;
 import io.clean.tdd.hp12.domain.point.model.Point;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
@@ -96,8 +96,9 @@ public class ReservationService {
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
         waitingQueueRepository.save(expiredToken);
 
-        //6. 외부 data platform 으로 완료된 reservation 전송 메시지 발행
-        finalizedReservations.forEach(reservationRepository::produceReservationMessage);
+        //(data platform 으로 reservation 정보 전송)
+        finalizedReservations
+            .forEach(reservation -> applicationEventPublisher.publishEvent(new ReservationCompletionEvent(reservation)));
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
