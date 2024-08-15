@@ -15,7 +15,9 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "reservation_outbox", indexes = {
     @Index(name = "idx_reservation_id", columnList = "reservation_id")
@@ -39,7 +41,7 @@ public class ReservationOutboxEntity {
     @JoinColumn(name = "reservation_id", nullable = false)
     ReservationEntity reservationEntity;
 
-    public static ReservationOutboxEntity issueOutboxMessage(Reservation reservation) {
+    public static ReservationOutboxEntity issueOutOf(Reservation reservation) {
         ReservationOutboxEntity reservationOutboxEntity = new ReservationOutboxEntity();
         reservationOutboxEntity.status = ReservationOutboxStatus.CREATED;
         reservationOutboxEntity.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);

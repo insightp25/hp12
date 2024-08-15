@@ -16,7 +16,7 @@ public class ReservationEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void saveReservationOutboxMessage(ReservationCompletionEvent reservationCompletionEvent) {
-        reservationOutboxRepository.save(reservationCompletionEvent.reservation());
+        reservationOutboxRepository.saveOutOf(reservationCompletionEvent.reservation());
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

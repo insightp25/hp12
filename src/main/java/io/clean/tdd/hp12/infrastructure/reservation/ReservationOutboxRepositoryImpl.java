@@ -13,8 +13,8 @@ public class ReservationOutboxRepositoryImpl implements ReservationOutboxReposit
     private final ReservationOutboxJpaRepository reservationOutboxJpaRepository;
 
     @Override
-    public void save(Reservation reservation) {
-        ReservationOutboxEntity reservationOutboxEntity = ReservationOutboxEntity.issueOutboxMessage(reservation);
+    public void saveOutOf(Reservation reservation) {
+        ReservationOutboxEntity reservationOutboxEntity = ReservationOutboxEntity.issueOutOf(reservation);
         reservationOutboxJpaRepository.save(reservationOutboxEntity);
     }
 }
