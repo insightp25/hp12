@@ -15,9 +15,9 @@ public class DataPlatformEventListener {
     private final DataPlatformService dataPlatformService;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleReservationData(ReservationCompletionEvent reservationCompletionEvent) {
+    public void handleReservationData(ReservationDataEvent reservationDataEvent) {
         try {
-            dataPlatformService.sendReservationData(reservationCompletionEvent.reservation());
+            dataPlatformService.sendReservationData(reservationDataEvent.reservation());
         } catch (Exception e) {
             log.debug("Error has occurred during async operation: handleReservationData(), cause={}, message={}", e.getCause(), e.getMessage());
         }
