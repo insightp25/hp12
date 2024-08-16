@@ -108,16 +108,16 @@ public class KafkaConfigurationTest {
 
         //when
         reservationOutboxRepository.saveOutOf(reservation); //reservation outbox 저장(상태: 초기화)
-        ReservationOutboxEntity result1 = reservationOutboxJpaRepository.findByReservationEntity_Id(1L); //메세지 consume 전 reservation outbox 상태 확인
+        ReservationOutboxEntity result1 = reservationOutboxJpaRepository.findByReservationEntity_Id(1L); //메세지 consume 전 reservation outbox 아카이브
 
         reservationMessageProducer.produceReservationMessage(reservation); //카프카 메시지 발행
 
         Thread.sleep(10_000); //10초 동안 producer 가 kafka message 를 발행하고 consumer 가 message 를 실행할 때까지 대기
 
-        ReservationOutboxEntity result2 = reservationOutboxJpaRepository.findByReservationEntity_Id(1L); //메세지 consume 후 reservation outbox 상태 확인
+        ReservationOutboxEntity result2 = reservationOutboxJpaRepository.findByReservationEntity_Id(1L); //메세지 consume 후 reservation outbox 아카이브
 
         //then
-        Assertions.assertThat(result1.getStatus()).isEqualTo(ReservationOutboxStatus.CREATED);
-        Assertions.assertThat(result2.getStatus()).isEqualTo(ReservationOutboxStatus.PUBLISHED);
+        Assertions.assertThat(result1.getStatus()).isEqualTo(ReservationOutboxStatus.CREATED); //메세지 consume 전 reservation outbox 상태 확인
+        Assertions.assertThat(result2.getStatus()).isEqualTo(ReservationOutboxStatus.PUBLISHED); //메세지 consume 후 reservation outbox 상태 변경 확인
     }
 }

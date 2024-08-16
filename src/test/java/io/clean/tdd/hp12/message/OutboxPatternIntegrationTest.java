@@ -160,12 +160,17 @@ public class OutboxPatternIntegrationTest {
         ReservationOutboxEntity result3 = reservationOutboxJpaRepository.findByReservationEntity_Id(pendingSeat3Reservation.id()); //검증 위해 outbox 조회
 
         //then
+        // outbox 의 message 상태 created -> published 변경 검증
         Assertions.assertThat(result1.getStatus()).isEqualTo(ReservationOutboxStatus.PUBLISHED);
         Assertions.assertThat(result2.getStatus()).isEqualTo(ReservationOutboxStatus.PUBLISHED);
         Assertions.assertThat(result3.getStatus()).isEqualTo(ReservationOutboxStatus.PUBLISHED);
+
+        // 메시지에 담은 예약정보가 outbox message payload 의 예약정보와 동일한지 검증
         Assertions.assertThat(result1.getReservationEntity().getId()).isEqualTo(pendingSeat1Reservation.id());
         Assertions.assertThat(result2.getReservationEntity().getId()).isEqualTo(pendingSeat2Reservation.id());
         Assertions.assertThat(result3.getReservationEntity().getId()).isEqualTo(pendingSeat3Reservation.id());
+
+        // message 로 발송된 예약 정보가 비즈니스 로직이 제대로 수행된 정보인지 검증
         Assertions.assertThat(result1.getReservationEntity().getStatus()).isEqualTo(ReservationStatus.FINALIZED);
         Assertions.assertThat(result2.getReservationEntity().getStatus()).isEqualTo(ReservationStatus.FINALIZED);
         Assertions.assertThat(result3.getReservationEntity().getStatus()).isEqualTo(ReservationStatus.FINALIZED);
