@@ -20,7 +20,8 @@ import lombok.Getter;
 @Getter
 @Entity
 @Table(name = "reservation_outbox", indexes = {
-    @Index(name = "idx_reservation_id", columnList = "reservation_id")
+    @Index(name = "idx_reservation_id", columnList = "reservation_id"),
+    @Index(name = "idx_createdAt_status", columnList = "created_at, status")
 })
 public class ReservationOutboxEntity {
 
