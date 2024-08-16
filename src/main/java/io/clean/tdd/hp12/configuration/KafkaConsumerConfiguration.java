@@ -34,4 +34,24 @@ public class KafkaConsumerConfiguration {
 
         return reservationListenerContainerFactory;
     }
+
+    @Bean
+    public ConsumerFactory<Long, Reservation> reservationConsumerFactory2() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group-id-2");
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        properties.put(JsonDeserializer.TRUSTED_PACKAGES, "io.clean.tdd.hp12.domain.reservation.model");
+
+        return new DefaultKafkaConsumerFactory<>(properties, new LongDeserializer(), new JsonDeserializer<>(Reservation.class));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory2() {
+        ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory2 = new ConcurrentKafkaListenerContainerFactory<>();
+        reservationListenerContainerFactory2.setConsumerFactory(reservationConsumerFactory2());
+
+        return reservationListenerContainerFactory2;
+    }
 }

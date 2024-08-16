@@ -76,22 +76,22 @@ public class ReservationService {
         Payment payment = paymentRepository.findById(paymentId);
         point.validateSufficient(payment.amount());
 
-        //2. point: 포인트를 결제금액만큼 사용한다(+사용내역을 추가한다)
+        //2. point: 포인트를 결제금액만큼 사용한다(+결제 정보를 완료 처리하고 포인트 사용내역을 추가한다)
         Point deductedPoint = pointRepository.save(point.use(payment.amount()));
+        paymentRepository.save(payment.complete());
         pointHistoryRepository.save(PointHistory.generateUseTypeOf(deductedPoint.user(), payment.amount()));
 
-        //3. reservation: 예약의 상태를 완료로 변경후 저장한다
-        //reservation_outbox 데이터 생성후 함께 저장(domain 에서 outbox 존재 모르도록 구현)
-        List<Reservation> finalizedReservations = reservationRepository.findByPaymentId(paymentId).stream()
-            .map(Reservation::finalizeStatus)
-            .map(reservationRepository::save) //reservation_outbox 데이터 함께 저장
-            .toList();
-
-        //4. seat: 좌석의 상태를 '점유'로 변경한다
-        finalizedReservations.stream()
+        //3. seat: 좌석의 상태를 '점유'로 변경한다
+        reservationRepository.findByPaymentId(paymentId).stream()
             .map(Reservation::seat)
             .map(Seat::close)
             .forEach(seatRepository::save);
+
+        //4. reservation: 예약의 상태를 완료로 변경후 저장한다
+        List<Reservation> finalizedReservations = reservationRepository.findByPaymentId(paymentId).stream()
+            .map(Reservation::finalizeStatus)
+            .map(reservationRepository::save)
+            .toList();
 
         //5. waiting queue: 대기 토큰을 만료한다
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)

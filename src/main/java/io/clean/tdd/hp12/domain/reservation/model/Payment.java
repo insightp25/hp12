@@ -34,8 +34,19 @@ public record Payment(
 
     public Payment abolish() {
         return Payment.builder()
+            .id(id)
             .amount(amount)
             .status(PaymentStatus.ABOLISHED)
+            .createdAt(createdAt)
+            .user(user)
+            .build();
+    }
+
+    public Payment complete() {
+        return Payment.builder()
+            .id(id)
+            .amount(amount)
+            .status(PaymentStatus.COMPLETE)
             .createdAt(createdAt)
             .user(user)
             .build();

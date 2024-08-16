@@ -27,4 +27,12 @@ public class KafkaTopicConfig {
             .partitions(3)
             .build();
     }
+
+    @Bean
+    public NewTopic reservationOutboxTopic() {
+        return TopicBuilder
+            .name("reservation-outbox")
+            .partitions(3)
+            .build();
+    }
 }

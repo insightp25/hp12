@@ -1,4 +1,4 @@
-package io.clean.tdd.hp12.infrastructure.reservation;
+package io.clean.tdd.hp12.infrastructure.reservation.message;
 
 import io.clean.tdd.hp12.common.MessageTopics;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
@@ -16,5 +16,6 @@ public class ReservationMessageKafkaProducer implements ReservationMessageProduc
     @Override
     public void produceReservationMessage(Reservation reservation) {
         reservationKafkaTemplate.send(MessageTopics.RESERVATIONS, reservation.id(), reservation);
+        reservationKafkaTemplate.send(MessageTopics.RESERVATION_OUTBOX, reservation.id(), reservation);
     }
 }

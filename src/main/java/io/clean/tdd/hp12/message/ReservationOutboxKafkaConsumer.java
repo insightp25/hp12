@@ -13,7 +13,7 @@ public class ReservationOutboxKafkaConsumer {
 
     private final ReservationOutboxJpaRepository reservationOutboxJpaRepository;
 
-    @KafkaListener(topics = "reservations", groupId = "test-group-id-1", containerFactory = "reservationListenerContainerFactory")
+    @KafkaListener(topics = "reservation-outbox", groupId = "test-group-id-2", containerFactory = "reservationListenerContainerFactory2")
     public void listen(Reservation reservation) {
         ReservationOutboxEntity reservationOutboxEntity = reservationOutboxJpaRepository.findByReservationEntity_Id(reservation.id());
         reservationOutboxJpaRepository.save(reservationOutboxEntity.toPublishedStatus());

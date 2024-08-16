@@ -47,16 +47,18 @@ public record Reservation(
 
     public Reservation finalizeStatus() {
         return Reservation.builder()
-                .status(ReservationStatus.FINALIZED)
-                .createdAt(createdAt)
-                .seat(seat)
-                .user(user)
-                .payment(payment)
-                .build();
+            .id(id)
+            .status(ReservationStatus.FINALIZED)
+            .createdAt(createdAt)
+            .seat(seat)
+            .user(user)
+            .payment(payment)
+            .build();
     }
 
     public Reservation abolishStatus() {
         return Reservation.builder()
+            .id(id)
             .status(ReservationStatus.ABOLISHED)
             .createdAt(createdAt)
             .seat(seat)
