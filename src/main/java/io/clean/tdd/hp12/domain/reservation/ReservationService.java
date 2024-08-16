@@ -2,7 +2,7 @@ package io.clean.tdd.hp12.domain.reservation;
 
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
-import io.clean.tdd.hp12.domain.data.event.ReservationDataEvent;
+import io.clean.tdd.hp12.domain.reservation.event.ReservationCompletionEvent;
 import io.clean.tdd.hp12.domain.point.model.Point;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
@@ -34,7 +34,9 @@ public class ReservationService {
     private final PointHistoryRepository pointHistoryRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingQueueRepository waitingQueueRepository;
+
     private final ApplicationEventPublisher applicationEventPublisher;
+
 
     @Transactional
     public List<Reservation> hold(long userId, long concertId, List<Integer> seatNumbers) {
@@ -74,21 +76,22 @@ public class ReservationService {
         Payment payment = paymentRepository.findById(paymentId);
         point.validateSufficient(payment.amount());
 
-        //2. point: 포인트를 결제금액만큼 사용한다(+사용내역을 추가한다)
+        //2. point: 포인트를 결제금액만큼 사용한다(+결제 정보를 완료 처리하고 포인트 사용내역을 추가한다)
         Point deductedPoint = pointRepository.save(point.use(payment.amount()));
+        paymentRepository.save(payment.complete());
         pointHistoryRepository.save(PointHistory.generateUseTypeOf(deductedPoint.user(), payment.amount()));
 
-        //3. reservation: 예약의 상태를 완료로 변경후 저장한다
+        //3. seat: 좌석의 상태를 '점유'로 변경한다
+        reservationRepository.findByPaymentId(paymentId).stream()
+            .map(Reservation::seat)
+            .map(Seat::close)
+            .forEach(seatRepository::save);
+
+        //4. reservation: 예약의 상태를 완료로 변경후 저장한다
         List<Reservation> finalizedReservations = reservationRepository.findByPaymentId(paymentId).stream()
             .map(Reservation::finalizeStatus)
             .map(reservationRepository::save)
             .toList();
-
-        //4. seat: 좌석의 상태를 '점유'로 변경한다
-        finalizedReservations.stream()
-            .map(Reservation::seat)
-            .map(Seat::close)
-            .forEach(seatRepository::save);
 
         //5. waiting queue: 대기 토큰을 만료한다
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
@@ -96,7 +99,7 @@ public class ReservationService {
 
         //(data platform 으로 reservation 정보 전송)
         finalizedReservations
-                .forEach(reservation -> applicationEventPublisher.publishEvent(new ReservationDataEvent(reservation)));
+            .forEach(finalizedReservation -> applicationEventPublisher.publishEvent(new ReservationCompletionEvent(finalizedReservation)));
 
         //6. 완료된 예약 정보를 반환한다
         return finalizedReservations;
