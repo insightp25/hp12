@@ -1,17 +1,13 @@
 package io.clean.tdd.hp12.infrastructure.reservation;
 
-import io.clean.tdd.hp12.common.MessageTopics;
 import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationEntity;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationOutboxEntity;
-import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
