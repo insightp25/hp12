@@ -24,8 +24,7 @@ public class KafkaTopicConfig {
     public NewTopic reservationTopic() {
         return TopicBuilder
             .name("reservations")
-            .partitions(1)
-            .replicas(1)
+            .partitions(3)
             .build();
     }
 }

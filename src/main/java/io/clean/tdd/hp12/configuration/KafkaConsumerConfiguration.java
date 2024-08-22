@@ -4,7 +4,6 @@ import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.ListDeserializer;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,7 @@ public class KafkaConsumerConfiguration {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group-id-1");
-        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ListDeserializer.class);
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         properties.put(JsonDeserializer.TRUSTED_PACKAGES, "io.clean.tdd.hp12.domain.reservation.model");
 
@@ -34,5 +33,25 @@ public class KafkaConsumerConfiguration {
         reservationListenerContainerFactory.setConsumerFactory(reservationConsumerFactory());
 
         return reservationListenerContainerFactory;
+    }
+
+    @Bean
+    public ConsumerFactory<Long, Reservation> reservationConsumerFactory2() {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group-id-2");
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        properties.put(JsonDeserializer.TRUSTED_PACKAGES, "io.clean.tdd.hp12.domain.reservation.model");
+
+        return new DefaultKafkaConsumerFactory<>(properties, new LongDeserializer(), new JsonDeserializer<>(Reservation.class));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory2() {
+        ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory2 = new ConcurrentKafkaListenerContainerFactory<>();
+        reservationListenerContainerFactory2.setConsumerFactory(reservationConsumerFactory2());
+
+        return reservationListenerContainerFactory2;
     }
 }

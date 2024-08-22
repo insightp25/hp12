@@ -10,7 +10,9 @@ import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "reservation", indexes = {
     @Index(name = "idx_created_at", columnList = "created_at")

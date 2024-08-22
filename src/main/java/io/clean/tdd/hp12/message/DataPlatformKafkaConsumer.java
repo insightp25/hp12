@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ReservationKafkaListener {
+public class DataPlatformKafkaConsumer {
 
     private final DataPlatformService dataPlatformService;
 

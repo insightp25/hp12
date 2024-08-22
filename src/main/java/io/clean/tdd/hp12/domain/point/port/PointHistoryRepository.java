@@ -7,5 +7,5 @@ import java.util.List;
 public interface PointHistoryRepository {
     List<PointHistory> findAllByUserId(long userId);
 
-    void save(PointHistory pointHistory);
+    PointHistory save(PointHistory pointHistory);
 }
