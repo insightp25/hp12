@@ -1,11 +1,10 @@
 package io.clean.tdd.hp12.interfaces.scheduler;
 
-import io.clean.tdd.hp12.common.BusinessPolicies;
 import io.clean.tdd.hp12.infrastructure.reservation.ReservationOutboxJpaRepository;
 import io.clean.tdd.hp12.infrastructure.reservation.enums.ReservationOutboxStatus;
 import io.clean.tdd.hp12.infrastructure.reservation.message.ReservationMessageKafkaProducer;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationEntity;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationOutboxEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.entity.ReservationEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.entity.ReservationOutboxEntity;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;

@@ -2,14 +2,15 @@ package io.clean.tdd.hp12.infrastructure.point.entity;
 
 import io.clean.tdd.hp12.domain.point.enums.TransactionType;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
-import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "point_history")
+@Table(name = "point_history", indexes = {
+    @Index(name = "idx_user_id", columnList = "user_id")
+})
 public class PointHistoryEntity {
 
     @Id

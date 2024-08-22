@@ -28,7 +28,7 @@ import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.domain.user.port.UserRepository;
 import io.clean.tdd.hp12.infrastructure.reservation.ReservationOutboxJpaRepository;
 import io.clean.tdd.hp12.infrastructure.reservation.enums.ReservationOutboxStatus;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationOutboxEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.entity.ReservationOutboxEntity;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
