@@ -1,7 +1,7 @@
 package io.clean.tdd.hp12.infrastructure.reservation;
 
 import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.entity.ReservationEntity;
 import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 

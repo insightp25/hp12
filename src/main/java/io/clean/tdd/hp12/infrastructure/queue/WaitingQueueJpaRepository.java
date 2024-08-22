@@ -1,9 +1,7 @@
 package io.clean.tdd.hp12.infrastructure.queue;
 
 import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
-import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.infrastructure.queue.entity.WaitingQueueEntity;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,8 +1,7 @@
-package io.clean.tdd.hp12.infrastructure.reservation.model;
+package io.clean.tdd.hp12.infrastructure.reservation.entity;
 
 import io.clean.tdd.hp12.domain.reservation.enums.PaymentStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Payment;
-import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 

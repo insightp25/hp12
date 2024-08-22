@@ -2,14 +2,17 @@ package io.clean.tdd.hp12.infrastructure.queue.entity;
 
 import io.clean.tdd.hp12.domain.queue.enums.WaitingQueueStatus;
 import io.clean.tdd.hp12.domain.queue.model.WaitingQueue;
-import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "waiting_queue")
+@Table(name = "waiting_queue", indexes = {
+    @Index(name = "idx_access_key", columnList = "access_key"),
+    @Index(name = "idx_user_id", columnList = "user_id"),
+    @Index(name = "idx_status", columnList = "status")
+})
 public class WaitingQueueEntity {
 
     @Id

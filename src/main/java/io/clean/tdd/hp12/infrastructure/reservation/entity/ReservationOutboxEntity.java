@@ -1,4 +1,4 @@
-package io.clean.tdd.hp12.infrastructure.reservation.model;
+package io.clean.tdd.hp12.infrastructure.reservation.entity;
 
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.infrastructure.reservation.enums.ReservationOutboxStatus;

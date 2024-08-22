@@ -2,7 +2,7 @@ package io.clean.tdd.hp12.message;
 
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.infrastructure.reservation.ReservationOutboxJpaRepository;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationOutboxEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.entity.ReservationOutboxEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;

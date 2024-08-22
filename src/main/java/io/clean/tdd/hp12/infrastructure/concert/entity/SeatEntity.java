@@ -1,13 +1,13 @@
 package io.clean.tdd.hp12.infrastructure.concert.entity;
 
 import io.clean.tdd.hp12.domain.concert.enums.SeatStatus;
-import io.clean.tdd.hp12.domain.concert.model.Concert;
 import io.clean.tdd.hp12.domain.concert.model.Seat;
-import io.clean.tdd.hp12.domain.concert.model.SeatOption;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "seat")
+@Table(name = "seat", indexes = {
+    @Index(name = "idx_concert_id", columnList = "concert_id")
+})
 public class SeatEntity {
 
     @Id
