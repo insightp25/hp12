@@ -16,6 +16,5 @@ public class ReservationMessageKafkaProducer implements ReservationMessageProduc
     @Override
     public void produceReservationMessage(Reservation reservation) {
         reservationKafkaTemplate.send(MessageTopics.RESERVATIONS, reservation.id(), reservation);
-        reservationKafkaTemplate.send(MessageTopics.RESERVATION_OUTBOX, reservation.id(), reservation);
     }
 }
