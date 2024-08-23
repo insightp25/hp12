@@ -110,9 +110,10 @@ public class IntegratedDataGenerationHelper {
 
                     generateReservation(ReservationStatus.FINALIZED, currentSeatOccupationOccasion, seat, user, payment); // 결제 정보 생성
 
-//                    if (k % (NUM_SEATS_PER_USER * ABOLISH_TO_COMPLETE_MULTIPLE_FACTOR) == 0) { // 1_000 // 1/8 번 째에 취소된 결제 정보 생성 (각 루프마다 12번 생성)
-//                        generatePayment(STANDARD_CLASS_SEAT_PRICE * NUM_SEATS_PER_USER, PaymentStatus.ABOLISHED, currentSeatOccupationOccasion, user); // 결제 정보 생성
-//                    }
+                    // 서브루프(반복 100회)에서 모수(100)가 8로 나눠 떨어지지 않으므로 의도했던 양의 정확한 데이터 생성이 불가 -> 루프 전체(반복 8_000회)의 모수(countMeter)에서 8의 mod 연산 수행하도록 변경
+                    //if (k % (NUM_SEATS_PER_USER * ABOLISH_TO_COMPLETE_MULTIPLE_FACTOR) == 0) { // 1_000 // 1/8 번 째에 취소된 결제 정보 생성 (각 루프마다 12번 생성)
+                    //    generatePayment(STANDARD_CLASS_SEAT_PRICE * NUM_SEATS_PER_USER, PaymentStatus.ABOLISHED, currentSeatOccupationOccasion, user); // 결제 정보 생성
+                    //}
                     if (countMeter % (NUM_SEATS_PER_USER * ABOLISH_TO_COMPLETE_MULTIPLE_FACTOR) == 0) {
                         generatePayment(STANDARD_CLASS_SEAT_PRICE * NUM_SEATS_PER_USER, PaymentStatus.ABOLISHED, currentSeatOccupationOccasion, user); // 결제 정보 생성
                     }
