@@ -97,11 +97,11 @@ public class ReservationService {
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
         waitingQueueRepository.save(expiredToken);
 
-        //(data platform 으로 reservation 정보 전송)
-        finalizedReservations
-            .forEach(finalizedReservation -> applicationEventPublisher.publishEvent(new ReservationCompletionEvent(finalizedReservation)));
+        // 6. (data platform 으로 reservation 정보 전송) // 부하 테스트 목적으로 임시 비활성화
+        //finalizedReservations
+        //    .forEach(finalizedReservation -> applicationEventPublisher.publishEvent(new ReservationCompletionEvent(finalizedReservation)));
 
-        //6. 완료된 예약 정보를 반환한다
+        //7. 완료된 예약 정보를 반환한다
         return finalizedReservations;
     }
 

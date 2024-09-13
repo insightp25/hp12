@@ -22,7 +22,7 @@ public class ReservationMessageFailOverScheduler {
     private final ReservationOutboxJpaRepository reservationOutboxJpaRepository;
     private final ReservationMessageKafkaProducer reservationMessageKafkaProducer;
 
-    @Scheduled(fixedRate = FAIL_OVER_INTERVAL_SECONDS * 1000)
+    // @Scheduled(fixedRate = FAIL_OVER_INTERVAL_SECONDS * 1000) // 부하 테스트 목적으로 임시 비활성화
     public void resendFailedReservationMessages() {
 
         LocalDateTime timestampFrom = LocalDateTime.now().minusSeconds(FAIL_OVER_SCAN_RANGE_SECONDS).truncatedTo(ChronoUnit.SECONDS);
