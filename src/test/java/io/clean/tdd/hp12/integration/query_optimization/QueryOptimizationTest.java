@@ -1,5 +1,6 @@
-package io.clean.tdd.hp12.common;
+package io.clean.tdd.hp12.integration.query_optimization;
 
+import io.clean.tdd.hp12.common.BusinessPolicies;
 import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ public class QueryOptimizationTest {
     private static final LocalDateTime BASE_DATE_TIME = LocalDateTime.of(2024, 8, 1, 13, 0, 0).truncatedTo(
         ChronoUnit.SECONDS);
 
-    @Disabled
+    @Disabled // 쿼리 최적화 테스트 필요시에 한하여 개별 수행
     @Test
     void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱스_없이_탐색하고_수행시간을_출력한다() {
         long startTime = System.currentTimeMillis();
@@ -43,7 +44,7 @@ public class QueryOptimizationTest {
         System.out.println("실행 시간: " + duration + " milliseconds");
     }
 
-    @Disabled
+    @Disabled // 쿼리 최적화 테스트 필요시에 한하여 개별 수행
     @Test
     void 임시예약_상태이고_예약시간이_만료된_모든_로우를_인덱스를_추가한_후_탐색하고_수행시간을_출력한다() {
         long startTime = System.currentTimeMillis();
