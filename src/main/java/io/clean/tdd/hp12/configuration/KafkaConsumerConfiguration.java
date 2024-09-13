@@ -18,7 +18,7 @@ public class KafkaConsumerConfiguration {
     @Bean
     public ConsumerFactory<Long, Reservation> reservationConsumerFactory() {
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "host.docker.internal:9092");
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group-id-1");
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
@@ -38,7 +38,7 @@ public class KafkaConsumerConfiguration {
     @Bean
     public ConsumerFactory<Long, Reservation> reservationConsumerFactory2() {
         Map<String, Object> properties = new HashMap<>();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "host.docker.internal:9092");
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group-id-2");
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
