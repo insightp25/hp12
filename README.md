@@ -1,12 +1,12 @@
 # 대기열 기반 대용량 트래픽 티켓 예매 서비스
 
-(🚧 진행 및 리뉴얼중입니다)
+(🚧 현재 리뉴얼중입니다 🚧)
 
 </br>
 
 ## Tech Stacks
 
-`Java` `Spring` `Spring Boot` `Gradle` `JPA` `MySQL` `Redis` `Kafka` `Docker` `Jenkins` `Swagger` `Prometheus` `Grafana` `K6` `Swagger`
+`Java` `Spring` `Spring Boot` `Gradle` `JPA` `MySQL` `Redis` `Kafka` `Docker` `Jenkins` `Prometheus` `Grafana` `K6` `Swagger`
 
 
 </br>
