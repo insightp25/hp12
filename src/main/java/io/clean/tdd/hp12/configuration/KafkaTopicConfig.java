@@ -9,18 +9,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaAdmin;
 
-@Configuration
+//@Configuration // 부하 테스트를 위한 임시 비활성화
 public class KafkaTopicConfig {
 
-    @Bean
+    //@Bean // 부하 테스트를 위한 임시 비활성화
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configurations = new HashMap<>();
-        configurations.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "host.docker.internal:9092");
+        configurations.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "broker:9092");
 
         return new KafkaAdmin(configurations);
     }
 
-    @Bean
+    //@Bean // 부하 테스트를 위한 임시 비활성화
     public NewTopic reservationTopic() {
         return TopicBuilder
             .name("reservations")

@@ -12,20 +12,20 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-@Configuration
+//@Configuration // 부하 테스트를 위한 임시 비활성화
 public class KafkaProducerConfiguration {
 
-    @Bean
+    //@Bean // 부하 테스트를 위한 임시 비활성화
     public ProducerFactory<Long, Reservation> reservationProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "host.docker.internal:9092");
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker:9092");
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
         configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
-    @Bean
+    //@Bean // 부하 테스트를 위한 임시 비활성화
     public KafkaTemplate<Long, Reservation> reservationKafkaTemplate() {
         return new KafkaTemplate<>(reservationProducerFactory());
     }

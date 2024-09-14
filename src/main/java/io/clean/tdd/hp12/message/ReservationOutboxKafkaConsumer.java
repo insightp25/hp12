@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component // 부하 테스트를 위한 임시 비활성화
 @RequiredArgsConstructor
 public class ReservationOutboxKafkaConsumer {
 
