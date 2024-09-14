@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaAdmin;
 
-//@Configuration // 부하 테스트를 위한 임시 비활성화
+@Configuration
 public class KafkaTopicConfig {
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configurations = new HashMap<>();
         configurations.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "broker:9092");
@@ -20,7 +20,7 @@ public class KafkaTopicConfig {
         return new KafkaAdmin(configurations);
     }
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public NewTopic reservationTopic() {
         return TopicBuilder
             .name("reservations")

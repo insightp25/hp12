@@ -12,10 +12,10 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-//@Configuration // 부하 테스트를 위한 임시 비활성화
+@Configuration
 public class KafkaConsumerConfiguration {
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public ConsumerFactory<Long, Reservation> reservationConsumerFactory() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker:9092");
@@ -27,7 +27,7 @@ public class KafkaConsumerConfiguration {
         return new DefaultKafkaConsumerFactory<>(properties, new LongDeserializer(), new JsonDeserializer<>(Reservation.class));
     }
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory = new ConcurrentKafkaListenerContainerFactory<>();
         reservationListenerContainerFactory.setConsumerFactory(reservationConsumerFactory());
@@ -35,7 +35,7 @@ public class KafkaConsumerConfiguration {
         return reservationListenerContainerFactory;
     }
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public ConsumerFactory<Long, Reservation> reservationConsumerFactory2() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker:9092");
@@ -47,7 +47,7 @@ public class KafkaConsumerConfiguration {
         return new DefaultKafkaConsumerFactory<>(properties, new LongDeserializer(), new JsonDeserializer<>(Reservation.class));
     }
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory2() {
         ConcurrentKafkaListenerContainerFactory<Long, Reservation> reservationListenerContainerFactory2 = new ConcurrentKafkaListenerContainerFactory<>();
         reservationListenerContainerFactory2.setConsumerFactory(reservationConsumerFactory2());

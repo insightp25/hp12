@@ -12,10 +12,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-//@Configuration // 부하 테스트를 위한 임시 비활성화
+@Configuration
 public class KafkaProducerConfiguration {
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public ProducerFactory<Long, Reservation> reservationProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker:9092");
@@ -25,7 +25,7 @@ public class KafkaProducerConfiguration {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
-    //@Bean // 부하 테스트를 위한 임시 비활성화
+    @Bean
     public KafkaTemplate<Long, Reservation> reservationKafkaTemplate() {
         return new KafkaTemplate<>(reservationProducerFactory());
     }
