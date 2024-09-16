@@ -29,6 +29,9 @@ public class SeatEntity {
     @JoinColumn(name = "concert_id", nullable = false)
     ConcertEntity concertEntity;
 
+    @Version
+    Integer version;
+
     public static SeatEntity from(Seat seat) {
         SeatEntity seatEntity = new SeatEntity();
         seatEntity.id = seat.id();
