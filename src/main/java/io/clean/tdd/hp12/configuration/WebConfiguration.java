@@ -21,6 +21,9 @@ public class WebConfiguration implements WebMvcConfigurer {
     );
 
     private final List<String> pathPatternsToExclude = List.of(
+        "/tokens/**", // 쿼리 최적화 테스트 및 부하 테스트용 임시 설정
+        "/stress-test", // 부하 테스트용 임시 설정
+        "/concertTitles/**" // 부하 테스트용 임시 설정
     );
 
     @Override

@@ -1,5 +1,6 @@
-package io.clean.tdd.hp12.common;
+package io.clean.tdd.hp12.integration.query_optimization;
 
+import io.clean.tdd.hp12.common.BusinessPolicies;
 import io.clean.tdd.hp12.domain.concert.enums.SeatStatus;
 import io.clean.tdd.hp12.domain.concert.model.Concert;
 import io.clean.tdd.hp12.domain.concert.model.ConcertTitle;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class TestDataGenerationHelper {
+public class QueryOptimizationTestDataGenerationHelper {
 
     private final UserJpaRepository userJpaRepository;
     private final ConcertTitleJpaRepository concertTitleJpaRepository;

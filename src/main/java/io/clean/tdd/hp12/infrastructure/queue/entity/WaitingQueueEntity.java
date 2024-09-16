@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "waiting_queue", indexes = {
     @Index(name = "idx_access_key", columnList = "access_key"),
     @Index(name = "idx_user_id", columnList = "user_id"),
-    @Index(name = "idx_status", columnList = "status")
+    @Index(name = "composite_idx_status_pk", columnList = "status, id")
 })
 public class WaitingQueueEntity {
 
