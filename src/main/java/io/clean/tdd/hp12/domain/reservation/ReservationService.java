@@ -2,6 +2,7 @@ package io.clean.tdd.hp12.domain.reservation;
 
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
+import io.clean.tdd.hp12.domain.reservation.event.ReservationCompletionEvent;
 import io.clean.tdd.hp12.domain.point.model.Point;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
@@ -15,12 +16,11 @@ import io.clean.tdd.hp12.domain.reservation.port.PaymentRepository;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
 import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.domain.user.port.UserRepository;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,6 +34,9 @@ public class ReservationService {
     private final PointHistoryRepository pointHistoryRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingQueueRepository waitingQueueRepository;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+
 
     @Transactional
     public List<Reservation> hold(long userId, long concertId, List<Integer> seatNumbers) {
@@ -73,27 +76,32 @@ public class ReservationService {
         Payment payment = paymentRepository.findById(paymentId);
         point.validateSufficient(payment.amount());
 
-        //2. point: 포인트를 결제금액만큼 사용한다(+사용내역을 추가한다)
+        //2. point: 포인트를 결제금액만큼 사용한다(+결제 정보를 완료 처리하고 포인트 사용내역을 추가한다)
         Point deductedPoint = pointRepository.save(point.use(payment.amount()));
+        paymentRepository.save(payment.complete());
         pointHistoryRepository.save(PointHistory.generateUseTypeOf(deductedPoint.user(), payment.amount()));
 
-        //3. reservation: 예약의 상태를 완료로 변경후 저장한다
+        //3. seat: 좌석의 상태를 '점유'로 변경한다
+        reservationRepository.findByPaymentId(paymentId).stream()
+            .map(Reservation::seat)
+            .map(Seat::close)
+            .forEach(seatRepository::save);
+
+        //4. reservation: 예약의 상태를 완료로 변경후 저장한다
         List<Reservation> finalizedReservations = reservationRepository.findByPaymentId(paymentId).stream()
             .map(Reservation::finalizeStatus)
             .map(reservationRepository::save)
             .toList();
 
-        //4. seat: 좌석의 상태를 '점유'로 변경한다
-        finalizedReservations.stream()
-            .map(Reservation::seat)
-            .map(Seat::close)
-            .forEach(seatRepository::save);
-
         //5. waiting queue: 대기 토큰을 만료한다
         WaitingQueue expiredToken = waitingQueueRepository.getByAccessKey(accessKey).expire(); // 멱등(스케쥴러가 중도에 만료시켰어도 에러를 던지지 않고 그대로 다시 저장)
         waitingQueueRepository.save(expiredToken);
 
-        //6. 완료된 예약 정보를 반환한다
+        // 6. (data platform 으로 reservation 정보 전송) // 부하 테스트 목적으로 임시 비활성화
+        //finalizedReservations
+        //    .forEach(finalizedReservation -> applicationEventPublisher.publishEvent(new ReservationCompletionEvent(finalizedReservation)));
+
+        //7. 완료된 예약 정보를 반환한다
         return finalizedReservations;
     }
 
@@ -101,9 +109,10 @@ public class ReservationService {
     @Transactional
     public void bulkAbolishTimedOutOnHoldReservations() {
         //1. 폐기 대상 예약 정보를 조회한다
-        List<Reservation> reservations = reservationRepository.findAllByStatusAndCreatedAtLessThanEqual(
-            ReservationStatus.ON_HOLD,
-            Reservation.generateBaseAbolishTimestamp());
+        List<Reservation> reservations = reservationRepository.findAllByCreatedAtBetweenAndStatus(
+            Reservation.generateBaseAbolishTimestampFrom(),
+            Reservation.generateBaseAbolishTimestampUntil(),
+            ReservationStatus.ON_HOLD);
 
         //2. 임시 상태의 예약 정보를 폐기 상태로 되돌리고 저장한다
         List<Reservation> abolishedReservations = reservations.stream()

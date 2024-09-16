@@ -3,12 +3,11 @@ package io.clean.tdd.hp12.infrastructure.reservation;
 import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
 import io.clean.tdd.hp12.domain.reservation.port.ReservationRepository;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationEntity;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
+import io.clean.tdd.hp12.infrastructure.reservation.entity.ReservationEntity;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,8 +29,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public List<Reservation> findAllByStatusAndCreatedAtLessThanEqual(ReservationStatus status, LocalDateTime abolishTimestamp) {
-        return reservationJpaRepository.findAllByStatusAndCreatedAtLessThanEqual(status, abolishTimestamp).stream()
+    public List<Reservation> findAllByCreatedAtBetweenAndStatus(
+        LocalDateTime abolishTimestampFrom, LocalDateTime abolishTimestampUntil, ReservationStatus status) {
+        return reservationJpaRepository
+            .findAllByCreatedAtBetweenAndStatus(abolishTimestampFrom, abolishTimestampUntil, status)
+            .stream()
             .map(ReservationEntity::toModel)
             .toList();
     }

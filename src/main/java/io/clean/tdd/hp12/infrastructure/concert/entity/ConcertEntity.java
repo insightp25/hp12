@@ -1,13 +1,14 @@
 package io.clean.tdd.hp12.infrastructure.concert.entity;
 
 import io.clean.tdd.hp12.domain.concert.model.Concert;
-import io.clean.tdd.hp12.domain.concert.model.ConcertTitle;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "concert")
+@Table(name = "concert", indexes = {
+    @Index(name = "idx_concert_title_id", columnList = "concert_title_id")
+})
 public class ConcertEntity {
 
     @Id

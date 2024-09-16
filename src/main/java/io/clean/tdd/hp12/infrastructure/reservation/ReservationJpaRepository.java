@@ -1,7 +1,7 @@
 package io.clean.tdd.hp12.infrastructure.reservation;
 
 import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
-import io.clean.tdd.hp12.infrastructure.reservation.model.ReservationEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.entity.ReservationEntity;
 import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,8 +13,9 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationEntit
 
     List<ReservationEntity> findByPaymentEntity_Id(long paymentId);
 
-    @Query("SELECT r FROM ReservationEntity r WHERE r.status = :status AND r.createdAt <= :abolishTimestamp")
-    List<ReservationEntity> findAllByStatusAndCreatedAtLessThanEqual(
-        @Param("status") ReservationStatus status,
-        @Param("abolishTimestamp") LocalDateTime abolishTimestamp);
+    @Query("SELECT r FROM ReservationEntity r WHERE r.createdAt BETWEEN :abolishTimestampFrom AND :abolishTimestampUntil AND r.status = :status")
+    List<ReservationEntity> findAllByCreatedAtBetweenAndStatus(
+        @Param("abolishTimestampFrom") LocalDateTime abolishTimestampFrom,
+        @Param("abolishTimestampUntil") LocalDateTime abolishTimestampUntil,
+        @Param("status") ReservationStatus status);
 }

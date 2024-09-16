@@ -2,7 +2,7 @@ package io.clean.tdd.hp12.infrastructure.reservation;
 
 import io.clean.tdd.hp12.domain.reservation.model.Payment;
 import io.clean.tdd.hp12.domain.reservation.port.PaymentRepository;
-import io.clean.tdd.hp12.infrastructure.reservation.model.PaymentEntity;
+import io.clean.tdd.hp12.infrastructure.reservation.entity.PaymentEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

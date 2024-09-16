@@ -1,18 +1,20 @@
-package io.clean.tdd.hp12.infrastructure.reservation.model;
+package io.clean.tdd.hp12.infrastructure.reservation.entity;
 
-import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.reservation.enums.ReservationStatus;
-import io.clean.tdd.hp12.domain.reservation.model.Payment;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
-import io.clean.tdd.hp12.domain.user.model.User;
 import io.clean.tdd.hp12.infrastructure.concert.entity.SeatEntity;
 import io.clean.tdd.hp12.infrastructure.user.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
 
+@Getter
 @Entity
-@Table(name = "reservation")
+@Table(name = "reservation", indexes = {
+    @Index(name = "idx_payment_id", columnList = "payment_id"),
+    @Index(name = "idx_created_at", columnList = "created_at")
+})
 public class ReservationEntity {
 
     @Id

@@ -24,6 +24,7 @@ public record WaitingQueue(
     public static WaitingQueue issueOf(User user) {
         return WaitingQueue.builder()
             .accessKey(UUID.randomUUID().toString())
+            .status(WaitingQueueStatus.WAITING)
             .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
             .lastAccessAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
             .expireAt(LocalDateTime.now().plusMinutes(BusinessPolicies.WAITING_TOKEN_DURATION_MINUTES).truncatedTo(ChronoUnit.SECONDS))
@@ -57,7 +58,7 @@ public record WaitingQueue(
     }
 
     public long estimateNumberOfTokensAhead(long firstTokenId) {
-        return id - firstTokenId;
+        return BusinessPolicies.TOKEN_ACTIVATION_CAPACITY + id - firstTokenId;
     }
 
     public boolean auditActivation(int activeStatusCount, long numberOfTokensAhead) {

@@ -22,7 +22,8 @@ public class PointHistoryRepositoryImpl implements PointHistoryRepository {
     }
 
     @Override
-    public void save(PointHistory pointHistory) {
-        pointHistoryJpaRepository.save(PointHistoryEntity.from(pointHistory));
+    public PointHistory save(PointHistory pointHistory) {
+        return pointHistoryJpaRepository.save(PointHistoryEntity.from(pointHistory))
+            .toModel();
     }
 }
