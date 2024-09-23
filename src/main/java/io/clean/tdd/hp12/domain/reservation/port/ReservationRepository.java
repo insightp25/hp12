@@ -13,4 +13,7 @@ public interface ReservationRepository {
 
     List<Reservation> findAllByCreatedAtBetweenAndStatus(LocalDateTime abolishTimestampFrom,
         LocalDateTime abolishTimestampUntil, ReservationStatus status);
+
+    @Deprecated
+    List<Reservation> findAllByUserId(long userId);
 }
