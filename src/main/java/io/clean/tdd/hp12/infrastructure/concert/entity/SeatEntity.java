@@ -3,8 +3,10 @@ package io.clean.tdd.hp12.infrastructure.concert.entity;
 import io.clean.tdd.hp12.domain.concert.enums.SeatStatus;
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter // 낙관락 전용
 @Table(name = "seat", indexes = {
     @Index(name = "idx_concert_id", columnList = "concert_id")
 })
@@ -34,7 +36,11 @@ public class SeatEntity {
 
     public static SeatEntity from(Seat seat) {
         SeatEntity seatEntity = new SeatEntity();
-        seatEntity.id = seat.id();
+        if (seat.id() > 0) { // 신규 생성이 아닌 경우에 한해 실행 // 낙관락 적용시 필요
+            seatEntity.id = seat.id();
+            seatEntity.version = seat.version();
+        }
+        // seatEntity.id = seat.id(); // 낙관락 적용시 필요
         seatEntity.status = seat.status();
         seatEntity.seatNumber = seat.seatNumber();
         seatEntity.seatOptionEntity = SeatOptionEntity.from(seat.seatOption());
@@ -50,6 +56,7 @@ public class SeatEntity {
             .seatNumber(seatNumber)
             .seatOption(seatOptionEntity.toModel())
             .concert(concertEntity.toModel())
+            .version(version) // 낙관락 적용시 필요
             .build();
     }
 }
