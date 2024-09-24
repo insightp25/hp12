@@ -14,7 +14,7 @@ public record Seat(
     Concert concert
 ) {
     public void validateAvailabile() {
-        if (status.equals(SeatStatus.OCCUPIED)) {
+        if (status.equals(SeatStatus.ON_HOLD) || status.equals(SeatStatus.OCCUPIED)) {
             throw new CustomException(ErrorCode.SEAT_OCCUPIED_ERROR, "좌석 %d 번".formatted(seatNumber()));
         }
     }
