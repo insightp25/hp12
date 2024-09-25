@@ -62,7 +62,7 @@ public class PessimisticLockTest {
     private ReservationRepository reservationRepository;
 
     @Test
-    void 낙관락을_적용한_동시성_테스트를_수행할_수_있다() {
+    void 비관락을_적용한_동시성_테스트를_수행할_수_있다() {
 
         // given
         List<User> users = new ArrayList<>();
