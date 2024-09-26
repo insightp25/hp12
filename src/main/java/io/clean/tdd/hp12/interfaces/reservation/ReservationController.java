@@ -2,6 +2,7 @@ package io.clean.tdd.hp12.interfaces.reservation;
 
 import io.clean.tdd.hp12.domain.reservation.ReservationService;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
+import io.clean.tdd.hp12.facade.reservation.ReservationFacade;
 import io.clean.tdd.hp12.interfaces.reservation.request.ReservationFinalizeRequest;
 import io.clean.tdd.hp12.interfaces.reservation.request.ReservationHoldRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationFacade reservationFacade;
 
     @PostMapping("/hold")
     public ResponseEntity<List<Reservation>> hold(
@@ -29,6 +31,18 @@ public class ReservationController {
         return ResponseEntity
             .ok()
             .body(reservationService.hold(
+                reservationHoldRequest.userId(),
+                reservationHoldRequest.concertId(),
+                reservationHoldRequest.seatNumbers()));
+    }
+
+    @PostMapping("/hold-with-distributed-lock")
+    public ResponseEntity<List<Reservation>> holdWithDistributedLock(
+        @RequestBody ReservationHoldRequest reservationHoldRequest) {
+
+        return ResponseEntity
+            .ok()
+            .body(reservationFacade.hold(
                 reservationHoldRequest.userId(),
                 reservationHoldRequest.concertId(),
                 reservationHoldRequest.seatNumbers()));
