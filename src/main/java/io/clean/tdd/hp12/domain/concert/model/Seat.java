@@ -11,10 +11,12 @@ public record Seat(
     SeatStatus status,
     int seatNumber,
     SeatOption seatOption,
-    Concert concert
+    Concert concert,
+
+    int version // 낙관락 위한 JPA 연관 로직 예외적 추가
 ) {
     public void validateAvailabile() {
-        if (status.equals(SeatStatus.OCCUPIED)) {
+        if (status.equals(SeatStatus.ON_HOLD) || status.equals(SeatStatus.OCCUPIED)) {
             throw new CustomException(ErrorCode.SEAT_OCCUPIED_ERROR, "좌석 %d 번".formatted(seatNumber()));
         }
     }
@@ -26,6 +28,7 @@ public record Seat(
             .seatNumber(seatNumber)
             .seatOption(seatOption)
             .concert(concert)
+            .version(version) // 낙관락 위한 JPA 연관 로직 예외적 추가
             .build();
     }
 
@@ -36,6 +39,7 @@ public record Seat(
             .seatNumber(seatNumber)
             .seatOption(seatOption)
             .concert(concert)
+            .version(version) // 낙관락 위한 JPA 연관 로직 예외적 추가
             .build();
     }
 
@@ -46,6 +50,7 @@ public record Seat(
             .seatNumber(seatNumber)
             .seatOption(seatOption)
             .concert(concert)
+            .version(version) // 낙관락 위한 JPA 연관 로직 예외적 추가
             .build();
     }
 }
