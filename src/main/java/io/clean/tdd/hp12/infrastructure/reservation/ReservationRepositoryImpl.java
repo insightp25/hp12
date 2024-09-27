@@ -37,4 +37,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
             .map(ReservationEntity::toModel)
             .toList();
     }
+
+    @Deprecated
+    @Override
+    public List<Reservation> findAllByUserId(long userId) {
+        return reservationJpaRepository.findByUserEntity_Id(userId).stream()
+            .map(ReservationEntity::toModel)
+            .toList();
+    }
 }

@@ -54,7 +54,7 @@ public class ReservationService {
         User user = userRepository.getById(userId);
         long dueAmount = Payment.calculateAmount(seatsOnHold);
         Payment payment = Payment.issuePayment(user, dueAmount);
-        paymentRepository.save(payment);
+        Payment savedPayment = paymentRepository.save(payment);
 
         //3. 임시 예약하는 현재 시점에서 대기열의 만료 시간을 정책시간 만큼 업데이트 한다.
         WaitingQueue token = waitingQueueRepository.findByUserId(user.id());
@@ -62,7 +62,7 @@ public class ReservationService {
         waitingQueueRepository.save(refreshedToken);
 
         //4. 임시 예약 정보를 생성후 저장한다
-        List<Reservation> reservations = Reservation.hold(seatsOnHold, user, payment);
+        List<Reservation> reservations = Reservation.hold(seatsOnHold, user, savedPayment);
         reservations.forEach(reservationRepository::save);
 
         //5. 임시 예약 정보를 반환한다

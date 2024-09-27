@@ -18,4 +18,7 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationEntit
         @Param("abolishTimestampFrom") LocalDateTime abolishTimestampFrom,
         @Param("abolishTimestampUntil") LocalDateTime abolishTimestampUntil,
         @Param("status") ReservationStatus status);
+
+    @Deprecated
+    List<ReservationEntity> findByUserEntity_Id(long userId);
 }

@@ -133,6 +133,11 @@ public class ReservationServiceTest {
             .seatOption(seatOption)
             .concert(concert)
             .build();
+        Payment payment = Payment.builder()
+            .id(1L)
+            .amount(300_000L)
+            .status(PaymentStatus.PENDING)
+            .build();
         WaitingQueue token = WaitingQueue.builder()
             .id(1L)
             .accessKey(UUID.randomUUID().toString())
@@ -143,28 +148,24 @@ public class ReservationServiceTest {
             .user(user)
             .build();
 
-        BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat1.seatNumber()))
-            .willReturn(seat1);
-        BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat2.seatNumber()))
-            .willReturn(seat2);
-        BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat3.seatNumber()))
-            .willReturn(seat3);
-        BDDMockito.given(seatRepository.save(seat1OnHold))
-            .willReturn(seat1OnHold);
-        BDDMockito.given(seatRepository.save(seat2OnHold))
-            .willReturn(seat2OnHold);
-        BDDMockito.given(seatRepository.save(seat3OnHold))
-            .willReturn(seat3OnHold);
-        BDDMockito.given(userRepository.getById(anyLong()))
-            .willReturn(user);
-        BDDMockito.given(paymentRepository.save(any(Payment.class)))
-            .willReturn(null);
-        BDDMockito.given(waitingQueueRepository.save(any(WaitingQueue.class)))
-            .willReturn(null);
-        BDDMockito.given(waitingQueueRepository.findByUserId(anyLong()))
-            .willReturn(token);
-        BDDMockito.given(reservationRepository.save(any(Reservation.class)))
-            .willAnswer(invocation -> invocation.<Reservation>getArgument(0));
+        //1. seat: 예약을 희망하는 좌석(들)을 임시 점유 처리한다
+        BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat1.seatNumber())).willReturn(seat1);
+        BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat2.seatNumber())).willReturn(seat2);
+        BDDMockito.given(seatRepository.findByConcertIdAndSeatNumber(concert.id(), seat3.seatNumber())).willReturn(seat3);
+        BDDMockito.given(seatRepository.save(seat1OnHold)).willReturn(seat1OnHold);
+        BDDMockito.given(seatRepository.save(seat2OnHold)).willReturn(seat2OnHold);
+        BDDMockito.given(seatRepository.save(seat3OnHold)).willReturn(seat3OnHold);
+
+        //2. 결제 정보를 생성후 저장한다
+        BDDMockito.given(userRepository.getById(anyLong())).willReturn(user);
+        BDDMockito.given(paymentRepository.save(any(Payment.class))).willReturn(payment);
+
+        //3. 임시 예약하는 현재 시점에서 대기열의 만료 시간을 정책시간 만큼 업데이트 한다.
+        BDDMockito.given(waitingQueueRepository.save(any(WaitingQueue.class))).willReturn(null);
+        BDDMockito.given(waitingQueueRepository.findByUserId(anyLong())).willReturn(token);
+
+        //4. 임시 예약 정보를 생성후 저장한다
+        BDDMockito.given(reservationRepository.save(any(Reservation.class))).willAnswer(invocation -> invocation.<Reservation>getArgument(0));
 
         //when
         List<Reservation> result = reservationService.hold(user.id(), concert.id(), new ArrayList<>(Arrays.asList(1, 2, 3)));
@@ -178,12 +179,14 @@ public class ReservationServiceTest {
             () -> assertThat(result.get(0).seat().status()).isEqualTo(SeatStatus.ON_HOLD),
             () -> assertThat(result.get(1).seat().status()).isEqualTo(SeatStatus.ON_HOLD),
             () -> assertThat(result.get(2).seat().status()).isEqualTo(SeatStatus.ON_HOLD),
+
             () -> assertThat(result.get(0).payment().amount()).isEqualTo(300_000L),
             () -> assertThat(result.get(1).payment().amount()).isEqualTo(300_000L),
             () -> assertThat(result.get(2).payment().amount()).isEqualTo(300_000L),
             () -> assertThat(result.get(0).payment().status()).isEqualTo(PaymentStatus.PENDING),
             () -> assertThat(result.get(1).payment().status()).isEqualTo(PaymentStatus.PENDING),
             () -> assertThat(result.get(2).payment().status()).isEqualTo(PaymentStatus.PENDING),
+
             () -> assertThat(result.get(0).user()).isEqualTo(User.builder().id(1L).build()),
             () -> assertThat(result.get(1).user()).isEqualTo(User.builder().id(1L).build()),
             () -> assertThat(result.get(2).user()).isEqualTo(User.builder().id(1L).build())
