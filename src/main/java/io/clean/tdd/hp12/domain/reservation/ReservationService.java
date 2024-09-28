@@ -2,7 +2,6 @@ package io.clean.tdd.hp12.domain.reservation;
 
 import io.clean.tdd.hp12.domain.concert.model.Seat;
 import io.clean.tdd.hp12.domain.concert.port.SeatRepository;
-import io.clean.tdd.hp12.domain.reservation.event.ReservationCompletionEvent;
 import io.clean.tdd.hp12.domain.point.model.Point;
 import io.clean.tdd.hp12.domain.point.model.PointHistory;
 import io.clean.tdd.hp12.domain.point.port.PointHistoryRepository;
@@ -37,6 +36,42 @@ public class ReservationService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    @Transactional
+    public List<Seat> holdSeats(long concertId, List<Integer> seatNumbers) {
+        //1. seat: 예약을 희망하는 좌석(들)을 임시 점유 처리한다
+        List<Seat> seats = seatNumbers.stream()
+            .map(seatNumber -> seatRepository.findByConcertIdAndSeatNumber(concertId, seatNumber))
+            .toList();
+        seats.forEach(Seat::validateAvailable);
+        List<Seat> seatsOnHold = seats.stream()
+            .map(Seat::hold)
+            .map(seatRepository::save)
+            .toList();
+        return seatsOnHold;
+    }
+
+    @Transactional
+    public List<Reservation> holdReservation(long userId, List<Seat> seatsOnHold) {
+        //2. 결제 정보를 생성후 저장한다
+        User user = userRepository.getById(userId);
+        long dueAmount = Payment.calculateAmount(seatsOnHold);
+        Payment payment = Payment.issuePayment(user, dueAmount);
+        Payment savedPayment = paymentRepository.save(payment);
+
+        //3. 임시 예약 정보를 생성후 저장한다
+        List<Reservation> reservations = Reservation.hold(seatsOnHold, user, savedPayment);
+        reservations.forEach(reservationRepository::save);
+
+        return reservations;
+    }
+
+    public void extendWaitingQueueExpirationTime(long userId) {
+        //4. 임시 예약하는 현재 시점에서 대기열의 만료 시간을 정책시간 만큼 업데이트 한다.
+        User user = userRepository.getById(userId);
+        WaitingQueue token = waitingQueueRepository.findByUserId(user.id());
+        WaitingQueue refreshedToken = token.refreshForPayment();
+        waitingQueueRepository.save(refreshedToken);
+    }
 
     @Transactional
     public List<Reservation> hold(long userId, long concertId, List<Integer> seatNumbers) {
@@ -44,7 +79,7 @@ public class ReservationService {
         List<Seat> seats = seatNumbers.stream()
             .map(seatNumber -> seatRepository.findByConcertIdAndSeatNumber(concertId, seatNumber))
             .toList();
-        seats.forEach(Seat::validateAvailabile);
+        seats.forEach(Seat::validateAvailable);
         List<Seat> seatsOnHold = seats.stream()
             .map(Seat::hold)
             .map(seatRepository::save)

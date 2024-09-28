@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.clean.tdd.hp12.domain.reservation.ReservationService;
 import io.clean.tdd.hp12.domain.reservation.model.Reservation;
+import io.clean.tdd.hp12.facade.reservation.ReservationFacade;
 import io.clean.tdd.hp12.interfaces.reservation.request.ReservationFinalizeRequest;
 import io.clean.tdd.hp12.interfaces.reservation.request.ReservationHoldRequest;
 import java.util.ArrayList;
@@ -40,6 +41,9 @@ public class ReservationControllerTest {
 
     @MockBean
     private ReservationService reservationService;
+
+    @MockBean
+    private ReservationFacade reservationFacade;
 
     private static final long RANDOM_ID_1L = 1L;
     private static final String RANDOM_UUID_STRING = UUID.randomUUID().toString();
